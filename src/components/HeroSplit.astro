@@ -1,0 +1,153 @@
+---
+interface Props {
+  titulo: string;
+  subtitulo?: string;
+  ctaTexto: string;
+  ctaUrl: string;
+  imagenSrc: string;
+  imagenAlt: string;
+  imagenLado?: 'izquierda' | 'derecha';
+  badge?: string;
+}
+
+const {
+  titulo,
+  subtitulo,
+  ctaTexto,
+  ctaUrl,
+  imagenSrc,
+  imagenAlt,
+  imagenLado = 'derecha',
+  badge,
+} = Astro.props;
+
+const reverse = imagenLado === 'izquierda';
+---
+
+<section class={`hero-split${reverse ? ' hero-split--reverse' : ''}`}>
+  <div class="hero-split__text">
+    {badge && <span class="hero-split__badge">{badge}</span>}
+    <h1 class="hero-split__title">{titulo}</h1>
+    {subtitulo && <p class="hero-split__sub">{subtitulo}</p>}
+    <a href={ctaUrl} class="hero-split__cta">{ctaTexto}</a>
+  </div>
+
+  <div class="hero-split__image-wrap">
+    <img
+      src={imagenSrc}
+      alt={imagenAlt}
+      width="720"
+      height="900"
+      fetchpriority="high"
+      decoding="async"
+      class="hero-split__img"
+    />
+  </div>
+</section>
+
+<style>
+  .hero-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100svh;
+    overflow: hidden;
+  }
+
+  .hero-split--reverse {
+    direction: rtl;
+  }
+  .hero-split--reverse > * {
+    direction: ltr;
+  }
+
+  .hero-split__text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(3rem, 8vw, 6rem) clamp(1.5rem, 5vw, 4rem);
+    background-color: var(--color-surface);
+  }
+
+  .hero-split__badge {
+    display: inline-block;
+    padding: 0.25rem 0.875rem;
+    background-color: var(--color-primary);
+    color: oklch(15% 0.02 270);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 2rem;
+    margin-bottom: 1.5rem;
+    align-self: flex-start;
+  }
+
+  .hero-split__title {
+    font-size: clamp(2rem, 4.5vw, 3.75rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    color: var(--color-text);
+    margin: 0 0 1.25rem;
+    text-wrap: balance;
+  }
+
+  .hero-split__sub {
+    font-size: clamp(0.9375rem, 1.8vw, 1.125rem);
+    line-height: 1.7;
+    color: oklch(from var(--color-text) l c h / 0.72);
+    margin: 0 0 2.5rem;
+    max-width: 44ch;
+  }
+
+  .hero-split__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    align-self: flex-start;
+    padding: 0.875rem 2rem;
+    background-color: var(--color-cta);
+    color: oklch(99% 0.005 230);
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background-color 0.2s, transform 0.15s;
+  }
+
+  .hero-split__cta:hover {
+    background-color: var(--color-cta-hover);
+    transform: translateY(-2px);
+  }
+
+  .hero-split__image-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-split__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .hero-split {
+      grid-template-columns: 1fr;
+      min-height: auto;
+      direction: ltr;
+    }
+
+    .hero-split__image-wrap {
+      height: clamp(18rem, 55vw, 28rem);
+      order: -1;
+    }
+
+    .hero-split__cta {
+      align-self: stretch;
+      justify-content: center;
+    }
+  }
+</style>

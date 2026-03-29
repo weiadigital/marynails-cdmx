@@ -1,0 +1,136 @@
+---
+interface Props {
+  titulo: string;
+  subtitulo?: string;
+  ctaTexto: string;
+  ctaUrl: string;
+  variante?: 'primario' | 'oscuro' | 'color';
+}
+
+const { titulo, subtitulo, ctaTexto, ctaUrl, variante = 'color' } = Astro.props;
+---
+
+<section class={`cta-principal cta-principal--${variante}`}>
+  <div class="cta-principal__inner">
+    <h2 class="cta-principal__title">{titulo}</h2>
+    {subtitulo && <p class="cta-principal__sub">{subtitulo}</p>}
+    <a href={ctaUrl} class="cta-principal__btn">{ctaTexto}</a>
+  </div>
+</section>
+
+<style>
+  .cta-principal {
+    padding: clamp(4rem, 10vw, 8rem) clamp(1.25rem, 5vw, 3rem);
+    text-align: center;
+  }
+
+  /* Variante: color (default) — fondo con color primary */
+  .cta-principal--color {
+    background-color: var(--color-primary);
+  }
+
+  .cta-principal--color .cta-principal__title {
+    color: oklch(15% 0.02 270);
+  }
+
+  .cta-principal--color .cta-principal__sub {
+    color: oklch(15% 0.02 270 / 0.75);
+  }
+
+  .cta-principal--color .cta-principal__btn {
+    background-color: oklch(15% 0.02 270);
+    color: var(--color-primary);
+  }
+
+  .cta-principal--color .cta-principal__btn:hover {
+    background-color: oklch(20% 0.03 270);
+  }
+
+  /* Variante: oscuro */
+  .cta-principal--oscuro {
+    background-color: oklch(15% 0.02 270);
+  }
+
+  .cta-principal--oscuro .cta-principal__title {
+    color: oklch(99% 0.005 230);
+  }
+
+  .cta-principal--oscuro .cta-principal__sub {
+    color: oklch(80% 0.01 230);
+  }
+
+  .cta-principal--oscuro .cta-principal__btn {
+    background-color: var(--color-cta);
+    color: oklch(99% 0.005 230);
+  }
+
+  .cta-principal--oscuro .cta-principal__btn:hover {
+    background-color: var(--color-cta-hover);
+  }
+
+  /* Variante: primario — fondo surface, texto oscuro */
+  .cta-principal--primario {
+    background-color: var(--color-surface);
+  }
+
+  .cta-principal--primario .cta-principal__title {
+    color: var(--color-text);
+  }
+
+  .cta-principal--primario .cta-principal__sub {
+    color: oklch(from var(--color-text) l c h / 0.7);
+  }
+
+  .cta-principal--primario .cta-principal__btn {
+    background-color: var(--color-cta);
+    color: oklch(99% 0.005 230);
+  }
+
+  .cta-principal--primario .cta-principal__btn:hover {
+    background-color: var(--color-cta-hover);
+  }
+
+  /* Layout */
+  .cta-principal__inner {
+    max-width: 44rem;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .cta-principal__title {
+    font-size: clamp(1.875rem, 5vw, 3rem);
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .cta-principal__sub {
+    font-size: clamp(1rem, 2vw, 1.1875rem);
+    line-height: 1.6;
+    margin: 0;
+    max-width: 40ch;
+    text-align: center;
+  }
+
+  .cta-principal__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding: 1rem 2.5rem;
+    font-weight: 700;
+    font-size: 1.0625rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background-color 0.2s, transform 0.15s;
+  }
+
+  .cta-principal__btn:hover {
+    transform: translateY(-2px);
+  }
+</style>

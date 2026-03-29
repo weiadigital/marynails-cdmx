@@ -1,0 +1,175 @@
+---
+/**
+ * T3 — Precio Al Frente
+ * Intención: "El cliente decide por precio — dárselo de inmediato"
+ * Sectores default: nail salon (F≤3), barbería moderna básica, taquería
+ * Estructura: Hero compacto con badge promo → Servicios lista INMEDIATO
+ *             → Testimonios → Mapa + horario → Footer
+ *
+ * INSTRUCCIONES PARA SOF.IA:
+ * 1. El hero es COMPACTO (55-65vh). El cliente debe ver precios
+ *    sin scroll en mobile. Esto es la regla #1 de este template.
+ * 2. ServiciosList va INMEDIATAMENTE después del hero, sin secciones intermedias.
+ * 3. Badge en HeroMinimal: si hay promo activa del campo "especial" del briefing,
+ *    mostrarla. Si no, poner el servicio más popular con precio.
+ * 4. Si el negocio NO tiene dirección física (servicio a domicilio),
+ *    omitir la sección de Mapa y Horario completa.
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroMinimal from '../components/HeroMinimal.astro';
+import ServiciosList from '../components/ServiciosList.astro';
+import SocialProofResenas from '../components/SocialProofResenas.astro';
+import ContactoWhatsApp from '../components/ContactoWhatsApp.astro';
+import Footer from '../components/Footer.astro';
+import GoogleTagManager from '../components/GoogleTagManager.astro';
+
+// ─── DATOS DEL CLIENTE ────────────────────────────────────────────────────────
+
+const negocio = {
+  nombre:      'Mary Nails – Diseño y Aplicación de Uñas',
+  descripcion: 'Especialista en el cuidado y embellecimiento de manos y pies. Servicios profesionales de aplicación de acrílico, gel de larga duración y diseños personalizados.',
+  telefono:    '5544231890',
+  whatsapp:    '5544231890',
+  direccion:   'Calle Hugonotes, Col. Miguel Hidalgo, Tláhuac, CDMX',
+  ciudad:      'Tláhuac, CDMX',
+  cp:          '13000',
+  horario:     'Lunes a viernes 10:00–20:00 h | Sábados 10:00–16:00 h | Domingos con cita previa',
+  tipoSchema:  'HealthAndBeautyBusiness',
+  email:       undefined,
+  tieneDireccion: true,
+  redes: [
+    { nombre: 'Instagram', url: 'https://instagram.com/marynails.cdmx', icono: 'instagram' },
+    { nombre: 'Facebook', url: 'https://facebook.com/marynails.cdmx', icono: 'facebook' },
+  ],
+};
+
+const seo = {
+  titulo:      'Mary Nails – Uñas acrílicas y diseños en Tláhuac',
+  descripcion: 'Especialista en uñas acrílicas, gelish y diseños personalizados en Tláhuac, CDMX. Precios accesibles, materiales de calidad. Agenda tu cita por WhatsApp.',
+  canonicalUrl: 'https://marynails.weia.digital',
+  ogImagen:    'https://marynails.weia.digital/galeria/rose-gold-oval-shimmer.webp',
+};
+
+const tokens = {
+  tokenPrimary:  'oklch(65% 0.18 350)',
+  tokenSurface:  'oklch(98% 0.005 350)',
+  tokenText:     'oklch(20% 0.02 350)',
+  tokenCta:      'oklch(65% 0.18 350)',
+};
+
+// Perfil de movimiento — derivado de Energía calculada del briefing
+// E 1-2 → 'subtle' | E 3-4 → 'fluid' | E 5 → 'expressive'
+const motionProfile = 'fluid' as 'subtle' | 'fluid' | 'expressive';
+
+const fuentes = {
+  heading: 'Playfair Display',
+  body:    'Inter',
+};
+
+// ─── CONTENIDO ────────────────────────────────────────────────────────────────
+
+const hero = {
+  titulo:    'Diseños que duran, en Tláhuac',
+  subtitulo: 'Uñas acrílicas, gelish y diseños personalizados con materiales de calidad',
+  badge:     '¡Diseño en 2 dedos GRATIS en tu primera aplicación!',
+  ctaTexto:  'Agenda tu cita',
+  ctaUrl:    `https://api.whatsapp.com/send?phone=521${negocio.whatsapp}&text=${encodeURIComponent('Hola, quiero agendar una cita para uñas')}`,
+};
+
+// LISTA COMPLETA de servicios con precios — este es el corazón del template
+const servicios = [
+  { nombre: 'Gelish (esmalte semipermanente)', precio: 180, descripcion: 'Esmalte de larga duración hasta 3 semanas' },
+  { nombre: 'Manicura Rusa', precio: 250, descripcion: 'Limpieza profunda de cutículas y uñas' },
+  { nombre: 'Uñas de Acrílico', precio: 400, descripcion: 'Set básico, un solo color' },
+  { nombre: 'Mantenimiento / Relleno', precio: 250, descripcion: 'Retoque de uñas acrílicas' },
+  { nombre: 'Pedicura Spa', precio: 350, descripcion: 'Tratamiento completo de pies' },
+  { nombre: 'Retiro de acrílico o gel', precio: 80, descripcion: 'Remoción profesional sin daño' },
+  { nombre: 'Diseño a mano alzada', precio: 30, descripcion: 'Por uña, desde $30' },
+  { nombre: 'Efectos especiales', precio: 100, descripcion: 'Espejo, aurora, holográfico (adicional)' },
+];
+
+const resenas: { nombre: string; texto: string; estrellas: number }[] = [
+  // SOLO reales — no inventar
+];
+
+// Google Maps embed — solo si tieneDireccion = true
+// CÓMO OBTENER LA URL (el cliente o tú la consiguen en 1 minuto):
+//   1. Ir a maps.google.com y buscar el negocio por nombre o dirección
+//   2. Clic en "Compartir" (ícono de compartir) → pestaña "Insertar un mapa"
+//   3. Copiar SOLO el valor del atributo src="..." del código iframe que aparece
+//      Ejemplo: "https://www.google.com/maps/embed?pb=!1m18..."
+//   4. Pegar esa URL aquí abajo
+// Si el cliente es a domicilio (tieneDireccion = false) → dejar como string vacío
+const mapsEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3765.7889644189627!2d-99.04516522625714!3d19.2915414451735!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85ce03c0843e6329%3A0xbd8bb6a179b4784c!2sHugonotes!5e0!3m2!1ses-419!2smx!4v1774767046202!5m2!1ses-419!2smx';
+
+const gtmId = '[GTM-XXXXXXX]';
+---
+
+{gtmId !== '[GTM-XXXXXXX]' && <GoogleTagManager gtmId={gtmId} />}
+
+<BaseLayout
+  titulo={seo.titulo}
+  descripcion={seo.descripcion}
+  canonicalUrl={seo.canonicalUrl}
+  ogImagen={seo.ogImagen}
+  schema={{
+    nombre:      negocio.nombre,
+    descripcion: negocio.descripcion,
+    telefono:    negocio.telefono,
+    direccion:   negocio.direccion,
+    ciudad:      negocio.ciudad,
+    cp:          negocio.cp,
+    horario:     negocio.horario,
+    tipoNegocio: negocio.tipoSchema,
+  }}
+  telefono={negocio.whatsapp}
+  mensajeWa={`Hola, vi tu página y quiero agendar una cita`}
+  {...tokens}
+  motionProfile={motionProfile}
+  fuenteHeading={fuentes.heading}
+  fuenteBody={fuentes.body}
+>
+  {/* ── SECCIÓN 1: Hero compacto — precio en badge ── */}
+  <HeroMinimal
+    titulo={hero.titulo}
+    subtitulo={hero.subtitulo}
+    badge={hero.badge}
+    ctaTexto={hero.ctaTexto}
+    ctaUrl={hero.ctaUrl}
+  />
+
+  {/* ── SECCIÓN 2: PRECIOS — INMEDIATAMENTE después del hero ──
+      Sin break, sin intermediario. El cliente los ve sin scroll en mobile. */}
+  <ServiciosList
+    servicios={servicios}
+    titulo="Precios"
+  />
+
+  {/* ── SECCIÓN 3: Testimonios (solo si hay reales) ── */}
+  {resenas.length > 0 && (
+    <SocialProofResenas
+      reseñas={resenas}
+      titulo="Clientes satisfechas"
+    />
+  )}
+
+  {/* ── SECCIÓN 4: Ubicación y horario (solo si tiene dirección física) ── */}
+  {negocio.tieneDireccion && (
+    <ContactoWhatsApp
+      telefono={negocio.whatsapp}
+      direccion={negocio.direccion}
+      horario={negocio.horario}
+      titulo="¿Dónde estamos?"
+      googleMapsEmbed={mapsEmbed}
+    />
+  )}
+
+  {/* ── SECCIÓN 5: Footer ── */}
+  <Footer
+    negocio={negocio.nombre}
+    direccion={negocio.tieneDireccion ? negocio.direccion : negocio.ciudad}
+    telefono={negocio.telefono}
+    redes={negocio.redes}
+  />
+</BaseLayout>

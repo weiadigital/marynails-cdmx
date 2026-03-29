@@ -1,0 +1,180 @@
+---
+/**
+ * T5 — Local Urgente
+ * Intención: "Estoy cerca, el mapa habla por mí"
+ * Sectores default: comida, farmacias, tiendas físicas, lavanderías
+ * Estructura: Hero con headline de ubicación → Mapa PROMINENTE primero
+ *             → Servicios/menú compacto → Horario visual → CTA WhatsApp → Footer
+ *
+ * INSTRUCCIONES PARA SOF.IA:
+ * 1. El headline del hero DEBE mencionar la ubicación o colonia.
+ *    ej. "La mejor birria de Tláhuac" o "A 5 minutos del metro Taxqueña"
+ * 2. El mapa va ANTES de los servicios — la ubicación es el argumento principal.
+ * 3. La sección de horario es OBLIGATORIA. Si no hay horario en el briefing,
+ *    preguntar al cliente — no se puede omitir en este template.
+ * 4. ServiciosList es compacto: máximo 8 items. Si hay más, agrupar
+ *    o usar solo los más populares con una nota "y más...".
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroMinimal from '../components/HeroMinimal.astro';
+import MapaProminente from '../components/MapaProminente.astro';
+import ServiciosList from '../components/ServiciosList.astro';
+import HorarioVisual from '../components/HorarioVisual.astro';
+import CTAPrincipal from '../components/CTAPrincipal.astro';
+import Footer from '../components/Footer.astro';
+import GoogleTagManager from '../components/GoogleTagManager.astro';
+
+// ─── DATOS DEL CLIENTE ────────────────────────────────────────────────────────
+
+const negocio = {
+  nombre:      '[NOMBRE_NEGOCIO]',
+  descripcion: '[DESCRIPCION_1_ORACION]',
+  telefono:    '[10_DIGITOS_SIN_PREFIJO]',
+  whatsapp:    '[10_DIGITOS_SIN_PREFIJO]',
+  direccion:   '[DIRECCION_COMPLETA]',
+  ciudad:      '[CIUDAD_ALCALDIA]',
+  cp:          '[CODIGO_POSTAL]',
+  tipoSchema:  '[TIPO_SCHEMA]',   // ej. 'Restaurant', 'FoodEstablishment'
+  email:       undefined,
+  redes: [],
+
+  // Horario desglosado para mostrar visualmente
+  horario: {
+    texto:   '[HORARIO_TEXTO_BREVE]',  // ej. "Lun-Sáb 8-21h | Dom 9-18h"
+    dias: [
+      { dia: 'Lunes',     horas: '[HORAS]', cerrado: false },
+      { dia: 'Martes',    horas: '[HORAS]', cerrado: false },
+      { dia: 'Miércoles', horas: '[HORAS]', cerrado: false },
+      { dia: 'Jueves',    horas: '[HORAS]', cerrado: false },
+      { dia: 'Viernes',   horas: '[HORAS]', cerrado: false },
+      { dia: 'Sábado',    horas: '[HORAS]', cerrado: false },
+      { dia: 'Domingo',   horas: '[HORAS]', cerrado: false },
+    ],
+  },
+};
+
+const seo = {
+  titulo:      '[TITULO_SEO_50_CHARS]',
+  descripcion: '[META_DESC_155_CHARS]',
+  canonicalUrl: 'https://[DOMINIO].vercel.app',
+  ogImagen:    'https://[DOMINIO].vercel.app/og-default.jpg',
+};
+
+const tokens = {
+  tokenPrimary:  '[TOKEN_PRIMARY_OKLCH]',
+  tokenSurface:  '[TOKEN_SURFACE_OKLCH]',
+  tokenText:     '[TOKEN_TEXT_OKLCH]',
+  tokenCta:      '[TOKEN_CTA_OKLCH]',
+};
+
+// Perfil de movimiento — derivado de Energía calculada del briefing
+// E 1-2 → 'subtle' | E 3-4 → 'fluid' | E 5 → 'expressive'
+const motionProfile = '[MOTION_PROFILE]' as 'subtle' | 'fluid' | 'expressive';
+
+const fuentes = {
+  heading: '[FUENTE_HEADING]',
+  body:    'Inter',
+};
+
+// ─── CONTENIDO ────────────────────────────────────────────────────────────────
+
+const hero = {
+  titulo:    '[HEADLINE_UBICACION_O_POPULARIDAD]',
+  // ej. "Los tacos de canasta más ricos de Iztapalapa"
+  // ej. "Lavandería express — a 2 cuadras del metro"
+  subtitulo: '[SUBTITULO_HORARIO_O_PRECIO]',
+  // ej. "Abierto lunes a sábado 7-20h · Entregas en 1 hora"
+  badge:     '[DATO_LLAMATIVO_OPCIONAL]',
+  // ej. "Desde $15" o "Entrega en 1 hora"
+  ctaTexto:  '[TEXTO_CTA]',
+  ctaUrl:    `https://api.whatsapp.com/send?phone=521${negocio.whatsapp}&text=${encodeURIComponent('Hola, quiero hacer un pedido')}`,
+};
+
+// Máximo 8 servicios/productos en este template
+const servicios = [
+  { nombre: '[ITEM_1]', precio: 0, descripcion: '[DESC_BREVE]' },
+  { nombre: '[ITEM_2]', precio: 0 },
+  { nombre: '[ITEM_3]', precio: 0 },
+  { nombre: '[ITEM_4]', precio: 0 },
+];
+
+const mapsEmbed = '[URL_IFRAME_GOOGLE_MAPS]'; // OBLIGATORIO en T5
+
+const cta = {
+  titulo:    '[HEADLINE_PEDIR_YA]',   // ej. "¿Se te antojó? Pide ahora"
+  ctaTexto:  '[TEXTO_CTA_PEDIDO]',
+  ctaUrl:    hero.ctaUrl,
+};
+
+const gtmId = '[GTM-XXXXXXX]';
+---
+
+{gtmId && <GoogleTagManager gtmId={gtmId} />}
+
+<BaseLayout
+  titulo={seo.titulo}
+  descripcion={seo.descripcion}
+  canonicalUrl={seo.canonicalUrl}
+  ogImagen={seo.ogImagen}
+  schema={{
+    nombre:      negocio.nombre,
+    descripcion: negocio.descripcion,
+    telefono:    negocio.telefono,
+    direccion:   negocio.direccion,
+    ciudad:      negocio.ciudad,
+    cp:          negocio.cp,
+    horario:     negocio.horario.texto,
+    tipoNegocio: negocio.tipoSchema,
+  }}
+  telefono={negocio.whatsapp}
+  mensajeWa={`Hola, quiero hacer un pedido en ${negocio.nombre}`}
+  {...tokens}
+  motionProfile={motionProfile}
+  fuenteHeading={fuentes.heading}
+  fuenteBody={fuentes.body}
+>
+  {/* ── SECCIÓN 1: Hero con headline de ubicación ── */}
+  <HeroMinimal
+    titulo={hero.titulo}
+    subtitulo={hero.subtitulo}
+    badge={hero.badge}
+    ctaTexto={hero.ctaTexto}
+    ctaUrl={hero.ctaUrl}
+  />
+
+  {/* ── SECCIÓN 2: MAPA — primero que los servicios ── */}
+  <MapaProminente
+    embedUrl={mapsEmbed}
+    direccion={negocio.direccion}
+    horario={negocio.horario.texto}
+    whatsapp={negocio.whatsapp}
+    mensajeWa={`Hola, quiero hacer un pedido en ${negocio.nombre}`}
+  />
+
+  {/* ── SECCIÓN 3: Servicios / menú compacto ── */}
+  <ServiciosList
+    servicios={servicios}
+    titulo="Menú / Precios"
+  />
+
+  {/* ── SECCIÓN 4: Horario visual detallado ── */}
+  <HorarioVisual dias={negocio.horario.dias} />
+
+  {/* ── SECCIÓN 5: CTA final ── */}
+  <CTAPrincipal
+    titulo={cta.titulo}
+    ctaTexto={cta.ctaTexto}
+    ctaUrl={cta.ctaUrl}
+    variante="color"
+  />
+
+  {/* ── SECCIÓN 6: Footer ── */}
+  <Footer
+    negocio={negocio.nombre}
+    direccion={negocio.direccion}
+    telefono={negocio.telefono}
+    redes={negocio.redes}
+  />
+</BaseLayout>
+

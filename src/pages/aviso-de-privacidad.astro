@@ -1,0 +1,34 @@
+---
+/**
+ * aviso-de-privacidad.astro — Página obligatoria LFPDPPP
+ * 
+ * SETUP: Reemplazar todos los [CORCHETES] con datos reales del cliente.
+ * Copiar este archivo a src/pages/aviso-de-privacidad.astro en cada proyecto.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AvisoPrivacidad from '../components/AvisoPrivacidad.astro';
+---
+
+<BaseLayout
+  titulo="Aviso de Privacidad"
+  descripcion="Aviso de privacidad y protección de datos personales de Mary Nails, en cumplimiento con la LFPDPPP."
+  schema={{
+    nombre: 'Mary Nails – Diseño y Aplicación de Uñas',
+    descripcion: 'Especialista en el cuidado y embellecimiento de manos y pies.',
+    telefono: '5544231890',
+    direccion: 'Calle Hugonotes, Col. Miguel Hidalgo, Tláhuac, CDMX',
+    ciudad: 'Tláhuac, CDMX',
+    tipoNegocio: 'HealthAndBeautyBusiness',
+  }}
+  telefono="5544231890"
+  mensajeWa="Hola, tengo una pregunta sobre el aviso de privacidad"
+>
+  <AvisoPrivacidad
+    negocio="Mary Nails – Diseño y Aplicación de Uñas"
+    domicilio="Calle Hugonotes, Col. Miguel Hidalgo, Tláhuac, CDMX"
+    email="contacto@marynails.weia.digital"
+    telefono="55 4423 1890"
+    usaIA={true}
+    nombreIA="Son.ia"
+  />
+</BaseLayout>

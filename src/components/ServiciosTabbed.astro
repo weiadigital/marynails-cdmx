@@ -1,0 +1,251 @@
+---
+/**
+ * ServiciosTabbed.astro — Servicios por categoría con tabs
+ * Usa :has() + radio inputs — Zero JS, accesible, CSS puro
+ * WCAG 2.2 AA. Soporte: todos los navegadores modernos.
+ * Uso: Belleza/Spa, Nail Salon — negocios con múltiples categorías
+ */
+
+interface Servicio {
+  nombre: string;
+  precio: number;
+  descripcion?: string;
+  duracion?: string; // "45 min", "1 hr"
+}
+
+interface Categoria {
+  nombre: string;
+  servicios: Servicio[];
+  icono?: string;
+}
+
+interface Props {
+  categorias: Categoria[];
+  titulo?: string;
+  moneda?: string;
+}
+
+const {
+  categorias,
+  titulo = 'Servicios',
+  moneda = '$',
+} = Astro.props;
+
+const uid = Math.random().toString(36).slice(2, 7);
+---
+
+<section class="servicios-tabbed" aria-labelledby={`st-heading-${uid}`}>
+  <div class="servicios-tabbed__inner">
+    <h2 class="servicios-tabbed__heading" id={`st-heading-${uid}`}>{titulo}</h2>
+
+    <div class="servicios-tabbed__widget">
+      {/* Radio inputs ocultos — controlan qué tab está activo vía CSS */}
+      {categorias.map((cat, i) => (
+        <input
+          type="radio"
+          name={`tabs-${uid}`}
+          id={`tab-${uid}-${i}`}
+          class="servicios-tabbed__radio"
+          checked={i === 0}
+          aria-label={cat.nombre}
+        />
+      ))}
+
+      {/* Labels = tabs visibles */}
+      <div class="servicios-tabbed__tabs" role="tablist">
+        {categorias.map((cat, i) => (
+          <label
+            for={`tab-${uid}-${i}`}
+            class="servicios-tabbed__tab"
+            role="tab"
+          >
+            {cat.icono && <span aria-hidden="true">{cat.icono}</span>}
+            {cat.nombre}
+          </label>
+        ))}
+      </div>
+
+      {/* Paneles de contenido */}
+      <div class="servicios-tabbed__panels">
+        {categorias.map((cat, i) => (
+          <div
+            class="servicios-tabbed__panel"
+            id={`panel-${uid}-${i}`}
+            data-index={i}
+            role="tabpanel"
+            aria-label={cat.nombre}
+          >
+            <ul class="servicios-tabbed__lista" role="list">
+              {cat.servicios.map((s) => (
+                <li class="servicios-tabbed__item">
+                  <div class="servicios-tabbed__info">
+                    <span class="servicios-tabbed__nombre">{s.nombre}</span>
+                    {s.descripcion && (
+                      <span class="servicios-tabbed__desc">{s.descripcion}</span>
+                    )}
+                    {s.duracion && (
+                      <span class="servicios-tabbed__dur">⏱ {s.duracion}</span>
+                    )}
+                  </div>
+                  <span
+                    class="servicios-tabbed__precio"
+                    aria-label={`Precio: ${moneda}${s.precio}`}
+                  >
+                    {moneda}{s.precio.toLocaleString('es-MX')}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .servicios-tabbed {
+    padding: clamp(4rem, 10vw, 7rem) clamp(1.25rem, 5vw, 3rem);
+    background-color: oklch(from var(--color-surface) calc(l - 0.02) c h);
+  }
+
+  .servicios-tabbed__inner {
+    max-width: 56rem;
+    margin-inline: auto;
+  }
+
+  .servicios-tabbed__heading {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin: 0 0 2.5rem;
+    text-align: center;
+  }
+
+  /* Ocultar radio inputs */
+  .servicios-tabbed__radio {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+  }
+
+  .servicios-tabbed__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid oklch(from var(--color-text) l c h / 0.1);
+    padding-bottom: 0;
+  }
+
+  .servicios-tabbed__tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: oklch(from var(--color-text) l c h / 0.55);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    border-radius: 0.375rem 0.375rem 0 0;
+    transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+  }
+
+  .servicios-tabbed__tab:hover {
+    color: var(--color-text);
+    background-color: oklch(from var(--color-primary) l c h / 0.06);
+  }
+
+  /* Paneles ocultos por defecto */
+  .servicios-tabbed__panel {
+    display: none;
+  }
+
+  /* Activar tab y panel según radio seleccionado — CSS puro */
+  /* Genera reglas para hasta 8 categorías */
+  .servicios-tabbed__radio:nth-of-type(1):checked ~ .servicios-tabbed__tabs .servicios-tabbed__tab:nth-child(1),
+  .servicios-tabbed__radio:nth-of-type(2):checked ~ .servicios-tabbed__tabs .servicios-tabbed__tab:nth-child(2),
+  .servicios-tabbed__radio:nth-of-type(3):checked ~ .servicios-tabbed__tabs .servicios-tabbed__tab:nth-child(3),
+  .servicios-tabbed__radio:nth-of-type(4):checked ~ .servicios-tabbed__tabs .servicios-tabbed__tab:nth-child(4),
+  .servicios-tabbed__radio:nth-of-type(5):checked ~ .servicios-tabbed__tabs .servicios-tabbed__tab:nth-child(5),
+  .servicios-tabbed__radio:nth-of-type(6):checked ~ .servicios-tabbed__tabs .servicios-tabbed__tab:nth-child(6) {
+    color: var(--color-cta);
+    border-bottom-color: var(--color-cta);
+    background-color: oklch(from var(--color-cta) l c h / 0.06);
+  }
+
+  .servicios-tabbed__radio:nth-of-type(1):checked ~ .servicios-tabbed__panels .servicios-tabbed__panel:nth-child(1),
+  .servicios-tabbed__radio:nth-of-type(2):checked ~ .servicios-tabbed__panels .servicios-tabbed__panel:nth-child(2),
+  .servicios-tabbed__radio:nth-of-type(3):checked ~ .servicios-tabbed__panels .servicios-tabbed__panel:nth-child(3),
+  .servicios-tabbed__radio:nth-of-type(4):checked ~ .servicios-tabbed__panels .servicios-tabbed__panel:nth-child(4),
+  .servicios-tabbed__radio:nth-of-type(5):checked ~ .servicios-tabbed__panels .servicios-tabbed__panel:nth-child(5),
+  .servicios-tabbed__radio:nth-of-type(6):checked ~ .servicios-tabbed__panels .servicios-tabbed__panel:nth-child(6) {
+    display: block;
+  }
+
+  /* Lista de servicios dentro del panel */
+  .servicios-tabbed__lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .servicios-tabbed__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.125rem 0;
+    border-bottom: 1px solid oklch(from var(--color-text) l c h / 0.08);
+  }
+
+  .servicios-tabbed__item:first-child {
+    border-top: 1px solid oklch(from var(--color-text) l c h / 0.08);
+  }
+
+  .servicios-tabbed__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .servicios-tabbed__nombre {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .servicios-tabbed__desc {
+    font-size: 0.875rem;
+    color: oklch(from var(--color-text) l c h / 0.6);
+    line-height: 1.5;
+  }
+
+  .servicios-tabbed__dur {
+    font-size: 0.8125rem;
+    color: oklch(from var(--color-text) l c h / 0.5);
+  }
+
+  .servicios-tabbed__precio {
+    font-size: 1.125rem;
+    font-weight: 800;
+    color: var(--color-cta);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 480px) {
+    .servicios-tabbed__tab {
+      font-size: 0.875rem;
+      padding: 0.5rem 0.875rem;
+    }
+  }
+</style>

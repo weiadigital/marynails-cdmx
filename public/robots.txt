@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and private directories
+Disallow: /admin/
+Disallow: /private/
+Disallow: /tmp/
+
+# Sitemap location
+Sitemap: https://tu-dominio.vercel.app/sitemap.xml

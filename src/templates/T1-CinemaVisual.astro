@@ -1,0 +1,228 @@
+---
+/**
+ * T1 — Cinema Visual
+ * Intención: "Mi trabajo habla por las imágenes"
+ * Sectores default: barbería tradicional, barbería moderna (E≥4)
+ * Estructura: Hero fullscreen → Dato impactante → Servicios grid
+ *             → Galería → Testimonios → CTA oscuro → Footer
+ *
+ * INSTRUCCIONES PARA SOF.IA:
+ * 1. Reemplaza todos los valores entre [CORCHETES] con datos del cliente
+ * 2. Los tokens OKLCH vienen del shadcn theme generator según sector+personalidad
+ * 3. El "dato impactante" en BreakVisual debe ser REAL (años, clientes, cortes)
+ *    Si no hay dato real → omitir esa sección y poner SocialProofResenas directamente
+ * 4. Gallery requiere mínimo 5 imágenes. Si fotos==false → generarlas con NanoBanana
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroCinema from '../components/HeroCinema.astro';
+import BreakNumerico from '../components/BreakNumerico.astro';
+import ServiciosGrid from '../components/ServiciosGrid.astro';
+import Gallery from '../components/Gallery.astro';
+import SocialProofResenas from '../components/SocialProofResenas.astro';
+import CTAPrincipal from '../components/CTAPrincipal.astro';
+import ContactoWhatsApp from '../components/ContactoWhatsApp.astro';
+import Footer from '../components/Footer.astro';
+import GoogleTagManager from '../components/GoogleTagManager.astro';
+
+// ─── DATOS DEL CLIENTE ────────────────────────────────────────────────────────
+// Reemplazar con datos reales del briefing
+
+const negocio = {
+  nombre:      '[NOMBRE_NEGOCIO]',
+  descripcion: '[DESCRIPCION_1_ORACION]',
+  telefono:    '[10_DIGITOS_SIN_PREFIJO]',
+  whatsapp:    '[10_DIGITOS_SIN_PREFIJO]',
+  direccion:   '[DIRECCION_COMPLETA]',
+  ciudad:      '[CIUDAD_ALCALDIA]',
+  cp:          '[CODIGO_POSTAL]',
+  horario:     '[HORARIO_TEXTO]',       // ej. "Lun-Sáb 10-20h"
+  tipoSchema:  '[TIPO_SCHEMA]',         // ej. 'BarberShop', 'BeautySalon'
+  email:       '[EMAIL_OPCIONAL]',
+  redes: [
+    // { nombre: 'Instagram', url: 'https://instagram.com/[HANDLE]' },
+    // { nombre: 'Facebook',  url: 'https://facebook.com/[PAGINA]' },
+  ],
+};
+
+const seo = {
+  titulo:      '[TITULO_SEO_50_CHARS]',    // ej. "Barbería El Gallo — Iztapalapa"
+  descripcion: '[META_DESC_155_CHARS]',    // incluir ciudad y servicio principal
+  canonicalUrl: 'https://[DOMINIO].vercel.app',
+  ogImagen:    'https://[DOMINIO].vercel.app/og-default.jpg',
+};
+
+// ─── TOKENS DE COLOR ──────────────────────────────────────────────────────────
+// Generados por shadcn theme generator según sector + personalidad calculada
+// Copiar los valores exactos del theme generator aquí
+
+const tokens = {
+  tokenPrimary:  '[TOKEN_PRIMARY_OKLCH]',   // ej. 'oklch(45% 0.12 30)'
+  tokenSurface:  '[TOKEN_SURFACE_OKLCH]',   // ej. 'oklch(97% 0.005 30)'
+  tokenText:     '[TOKEN_TEXT_OKLCH]',      // ej. 'oklch(15% 0.02 270)'
+  tokenCta:      '[TOKEN_CTA_OKLCH]',       // ej. 'oklch(55% 0.20 25)'
+};
+
+// Perfil de movimiento — derivado de Energía calculada del briefing
+// E 1-2 → 'subtle' | E 3-4 → 'fluid' | E 5 → 'expressive'
+const motionProfile = '[MOTION_PROFILE]' as 'subtle' | 'fluid' | 'expressive';
+
+// ─── TIPOGRAFÍA ───────────────────────────────────────────────────────────────
+const fuentes = {
+  heading: '[FUENTE_HEADING]',  // según sector en design-system.md §4
+  body:    'Inter',             // siempre Inter
+};
+
+// ─── CONTENIDO ────────────────────────────────────────────────────────────────
+
+const hero = {
+  titulo:    '[HEADLINE_FORMULA: Beneficio + lugar]',
+  subtitulo: '[SUBTITULO_PRECIO_DESDE_OPCIONAL]',
+  ctaTexto:  '[TEXTO_CTA]',   // ej. "Agenda tu corte", "Reserva tu lugar"
+  ctaUrl:    `https://api.whatsapp.com/send?phone=521${negocio.whatsapp}&text=${encodeURIComponent('Hola, vi tu página y quiero agendar')}`,
+  imagenSrc: '/images/hero.webp',
+  imagenAlt: '[DESCRIPCION_ALT_REAL]',
+  telefono:  negocio.telefono,
+};
+
+// Dato impactante para el break visual
+// SOLO poner si el dato es REAL y verificable
+const breakVisual = {
+  numero:    '[NUMERO_REAL]',      // ej. "2,400" o "8"
+  sufijo:    '[SUFIJO]',           // ej. "clientes atendidos" o "años de experiencia"
+  contexto:  '[CONTEXTO_BREVE]',   // ej. "en Iztapalapa" o "en el giro"
+};
+
+const servicios = [
+  { nombre: '[SERVICIO_1]', precio: 0, descripcion: '[DESC_OPCIONAL]', icono: '[EMOJI]' },
+  { nombre: '[SERVICIO_2]', precio: 0, descripcion: '[DESC_OPCIONAL]', icono: '[EMOJI]' },
+  { nombre: '[SERVICIO_3]', precio: 0, descripcion: '[DESC_OPCIONAL]', icono: '[EMOJI]' },
+  // Agregar más según briefing
+];
+
+const galeria = [
+  { src: '/images/galeria-1.webp', alt: '[DESC_ALT_REAL_1]' },
+  { src: '/images/galeria-2.webp', alt: '[DESC_ALT_REAL_2]' },
+  { src: '/images/galeria-3.webp', alt: '[DESC_ALT_REAL_3]' },
+  { src: '/images/galeria-4.webp', alt: '[DESC_ALT_REAL_4]' },
+  { src: '/images/galeria-5.webp', alt: '[DESC_ALT_REAL_5]' },
+];
+
+const resenas: { nombre: string; texto: string; estrellas: number }[] = [
+  // SOLO testimonios reales — NUNCA inventar
+  // { nombre: '[NOMBRE]', texto: '[TEXTO_REAL]', estrellas: 5 },
+];
+
+const cta = {
+  titulo:    '[HEADLINE_URGENCIA_SUAVE]',  // variación del hero con llamado
+  subtitulo: '[SUBTITULO_CTA_OPCIONAL]',
+  ctaTexto:  '[TEXTO_CTA]',
+  ctaUrl:    hero.ctaUrl,
+};
+
+// ─── GTM ──────────────────────────────────────────────────────────────────────
+const gtmId = '[GTM-XXXXXXX]';  // undefined si el cliente no tiene GTM aún
+---
+
+<!--- Google Tag Manager (head snippet — el body snippet está en BaseLayout) --->
+{gtmId && <GoogleTagManager gtmId={gtmId} />}
+
+<BaseLayout
+  titulo={seo.titulo}
+  descripcion={seo.descripcion}
+  canonicalUrl={seo.canonicalUrl}
+  ogImagen={seo.ogImagen}
+  schema={{
+    nombre:      negocio.nombre,
+    descripcion: negocio.descripcion,
+    telefono:    negocio.telefono,
+    direccion:   negocio.direccion,
+    ciudad:      negocio.ciudad,
+    cp:          negocio.cp,
+    horario:     negocio.horario,
+    tipoNegocio: negocio.tipoSchema,
+  }}
+  telefono={negocio.whatsapp}
+  mensajeWa={`Hola, vi la página de ${negocio.nombre} y quiero más información`}
+  avisoUrl="/aviso-de-privacidad"
+  {...tokens}
+  motionProfile={motionProfile}
+  fuenteHeading={fuentes.heading}
+  fuenteBody={fuentes.body}
+>
+  {/* ── SECCIÓN 1: Hero fullscreen ── */}
+  <HeroCinema
+    titulo={hero.titulo}
+    subtitulo={hero.subtitulo}
+    ctaTexto={hero.ctaTexto}
+    ctaUrl={hero.ctaUrl}
+    imagenSrc={hero.imagenSrc}
+    imagenAlt={hero.imagenAlt}
+    telefono={hero.telefono}
+  />
+
+  {/* ── SECCIÓN 2: Break visual — dato impactante ──
+      Si no hay dato real y verificable → eliminar este componente */}
+  <BreakNumerico
+    numero={breakVisual.numero}
+    sufijo={breakVisual.sufijo}
+    contexto={breakVisual.contexto}
+  />
+
+  {/* ── SECCIÓN 3: Servicios en grid ── */}
+  <ServiciosGrid
+    servicios={servicios}
+    titulo="Servicios y precios"
+    columnas={3}
+  />
+
+  {/* ── SECCIÓN 4: Galería ── */}
+  <Gallery
+    imagenes={galeria}
+    titulo="Nuestro trabajo"
+    columnas={3}
+  />
+
+  {/* ── SECCIÓN 5: Testimonios (solo si hay reales) ── */}
+  {resenas.length > 0 && (
+    <SocialProofResenas
+      reseñas={resenas}
+      titulo="Lo que dicen nuestros clientes"
+    />
+  )}
+
+  {/* ── SECCIÓN 6: CTA final ── */}
+  <CTAPrincipal
+    titulo={cta.titulo}
+    subtitulo={cta.subtitulo}
+    ctaTexto={cta.ctaTexto}
+    ctaUrl={cta.ctaUrl}
+    variante="oscuro"
+  />
+
+  {/* ── SECCIÓN 7: Contacto + Mapa (si hay dirección física) ──
+      googleMapsEmbed: URL del iframe de Google Maps.
+      CÓMO OBTENERLA (el cliente o tú la consiguen en 1 minuto):
+        1. Ir a maps.google.com y buscar el negocio
+        2. Clic en "Compartir" → pestaña "Insertar un mapa"
+        3. Copiar SOLO el valor del atributo src="..." del iframe que aparece
+        4. Pegar esa URL como valor de googleMapsEmbed
+      Si el cliente no tiene dirección física → omitir esta prop completa. */}
+  <ContactoWhatsApp
+    telefono={negocio.whatsapp}
+    direccion={negocio.direccion}
+    horario={negocio.horario}
+    titulo="¿Cómo llegar?"
+    googleMapsEmbed="[URL_SRC_DEL_IFRAME_GOOGLE_MAPS — ver instrucciones arriba]"
+  />
+
+  {/* ── SECCIÓN 8: Footer ── */}
+  <Footer
+    negocio={negocio.nombre}
+    direccion={negocio.direccion}
+    telefono={negocio.telefono}
+    email={negocio.email}
+    redes={negocio.redes}
+  />
+</BaseLayout>
+

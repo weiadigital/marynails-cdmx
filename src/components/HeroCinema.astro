@@ -1,0 +1,160 @@
+---
+interface Props {
+  titulo: string;
+  subtitulo?: string;
+  ctaTexto: string;
+  ctaUrl: string;
+  imagenSrc: string;
+  imagenAlt: string;
+  telefono?: string;
+}
+
+const { titulo, subtitulo, ctaTexto, ctaUrl, imagenSrc, imagenAlt, telefono } = Astro.props;
+---
+
+<section class="hero-cinema">
+  <div class="hero-cinema__bg">
+    <img
+      src={imagenSrc}
+      alt={imagenAlt}
+      width="1440"
+      height="810"
+      fetchpriority="high"
+      decoding="async"
+    />
+    <div class="hero-cinema__overlay" aria-hidden="true"></div>
+  </div>
+
+  <div class="hero-cinema__content">
+    <h1 class="hero-cinema__title">{titulo}</h1>
+    {subtitulo && <p class="hero-cinema__sub">{subtitulo}</p>}
+    <div class="hero-cinema__actions">
+      <a href={ctaUrl} class="btn-cta">{ctaTexto}</a>
+      {telefono && (
+        <a
+          href={`tel:${telefono.replace(/\D/g, '')}`}
+          class="btn-ghost"
+          aria-label={`Llamar al ${telefono}`}
+        >
+          Llamar ahora
+        </a>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-cinema {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: clamp(3rem, 8vw, 6rem);
+    overflow: hidden;
+  }
+
+  .hero-cinema__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero-cinema__bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+  }
+
+  .hero-cinema__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      oklch(10% 0.02 270 / 0.95) 0%,
+      oklch(10% 0.02 270 / 0.6) 50%,
+      oklch(10% 0.02 270 / 0.2) 100%
+    );
+  }
+
+  .hero-cinema__content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 5vw, 3rem);
+  }
+
+  .hero-cinema__title {
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: oklch(99% 0.005 230);
+    margin: 0 0 1rem;
+    max-width: 18ch;
+    text-wrap: balance;
+  }
+
+  .hero-cinema__sub {
+    font-size: clamp(1rem, 2.5vw, 1.375rem);
+    color: oklch(90% 0.01 230);
+    margin: 0 0 2.5rem;
+    max-width: 46ch;
+    line-height: 1.6;
+  }
+
+  .hero-cinema__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .btn-cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.875rem 2rem;
+    background-color: var(--color-cta);
+    color: oklch(99% 0.005 230);
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background-color 0.2s, transform 0.15s;
+  }
+
+  .btn-cta:hover {
+    background-color: var(--color-cta-hover);
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.875rem 2rem;
+    border: 2px solid oklch(99% 0.005 230 / 0.5);
+    color: oklch(99% 0.005 230);
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+
+  .btn-ghost:hover {
+    border-color: oklch(99% 0.005 230);
+    background-color: oklch(99% 0.005 230 / 0.1);
+  }
+
+  @media (max-width: 640px) {
+    .hero-cinema__actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .btn-cta, .btn-ghost {
+      justify-content: center;
+    }
+  }
+</style>

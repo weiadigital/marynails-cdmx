@@ -1,0 +1,472 @@
+---
+/**
+ * ContactoFormulario.astro — Formulario de contacto LFPDPPP compliant
+ * Validación: HTML5 nativa + mínimo JS para feedback visual
+ * Sin dependencias externas. WCAG 2.2 AA.
+ * Uso: salud, servicios profesionales, inmobiliaria
+ */
+
+interface Props {
+  titulo?: string;
+  subtitulo?: string;
+  endpoint?: string;       // URL del endpoint o Formspree/Netlify
+  avisoUrl?: string;
+  campos?: ('nombre' | 'telefono' | 'email' | 'mensaje' | 'servicio')[];
+  ctaTexto?: string;
+  servicios?: string[];    // Si incluye campo 'servicio'
+  whatsappFallback?: string; // Número por si el formulario falla
+}
+
+const {
+  titulo = 'Contáctanos',
+  subtitulo,
+  endpoint = '#',
+  avisoUrl = '/aviso-de-privacidad',
+  campos = ['nombre', 'telefono', 'mensaje'],
+  ctaTexto = 'Enviar mensaje',
+  servicios = [],
+  whatsappFallback,
+} = Astro.props;
+---
+
+<section class="contacto-form" aria-labelledby="cf-heading">
+  <div class="contacto-form__inner">
+    <header class="contacto-form__header">
+      <h2 class="contacto-form__titulo" id="cf-heading">{titulo}</h2>
+      {subtitulo && <p class="contacto-form__sub">{subtitulo}</p>}
+    </header>
+
+    <form
+      class="contacto-form__form"
+      method="POST"
+      action={endpoint}
+      novalidate
+      aria-label={titulo}
+    >
+      {campos.includes('nombre') && (
+        <div class="cf-campo">
+          <label class="cf-label" for="cf-nombre">
+            Nombre completo <span class="cf-req" aria-hidden="true">*</span>
+          </label>
+          <input
+            type="text"
+            id="cf-nombre"
+            name="nombre"
+            class="cf-input"
+            placeholder="Tu nombre"
+            required
+            autocomplete="name"
+            aria-required="true"
+          />
+        </div>
+      )}
+
+      {campos.includes('telefono') && (
+        <div class="cf-campo">
+          <label class="cf-label" for="cf-telefono">
+            Teléfono <span class="cf-req" aria-hidden="true">*</span>
+          </label>
+          <input
+            type="tel"
+            id="cf-telefono"
+            name="telefono"
+            class="cf-input"
+            placeholder="55 1234 5678"
+            required
+            autocomplete="tel"
+            pattern="[0-9\s\-\(\)]{10,15}"
+            aria-required="true"
+            aria-describedby="cf-telefono-hint"
+          />
+          <span class="cf-hint" id="cf-telefono-hint">10 dígitos, sin espacios</span>
+        </div>
+      )}
+
+      {campos.includes('email') && (
+        <div class="cf-campo">
+          <label class="cf-label" for="cf-email">
+            Correo electrónico
+          </label>
+          <input
+            type="email"
+            id="cf-email"
+            name="email"
+            class="cf-input"
+            placeholder="tu@correo.com"
+            autocomplete="email"
+          />
+        </div>
+      )}
+
+      {campos.includes('servicio') && servicios.length > 0 && (
+        <div class="cf-campo">
+          <label class="cf-label" for="cf-servicio">
+            Servicio de interés
+          </label>
+          <select id="cf-servicio" name="servicio" class="cf-input cf-select">
+            <option value="">Selecciona un servicio</option>
+            {servicios.map((s) => (
+              <option value={s}>{s}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {campos.includes('mensaje') && (
+        <div class="cf-campo">
+          <label class="cf-label" for="cf-mensaje">
+            Mensaje <span class="cf-req" aria-hidden="true">*</span>
+          </label>
+          <textarea
+            id="cf-mensaje"
+            name="mensaje"
+            class="cf-input cf-textarea"
+            placeholder="Cuéntanos en qué podemos ayudarte..."
+            required
+            rows={4}
+            aria-required="true"
+            minlength={10}
+          ></textarea>
+        </div>
+      )}
+
+      {/* Honeypot anti-spam */}
+      <input
+        type="text"
+        name="_gotcha"
+        tabindex="-1"
+        aria-hidden="true"
+        style="display:none;opacity:0;position:absolute;"
+      />
+
+      {/* Checkbox LFPDPPP — obligatorio */}
+      <div class="cf-campo cf-campo--checkbox">
+        <label class="cf-checkbox-label">
+          <input
+            type="checkbox"
+            name="privacidad"
+            class="cf-checkbox"
+            required
+            aria-required="true"
+            aria-describedby="cf-priv-desc"
+          />
+          <span class="cf-checkbox-custom" aria-hidden="true"></span>
+          <span id="cf-priv-desc" class="cf-checkbox-texto">
+            He leído y acepto el{' '}
+            <a
+              href={avisoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="cf-link"
+            >
+              aviso de privacidad
+            </a>
+            {' '}y el tratamiento de mis datos personales.
+          </span>
+        </label>
+      </div>
+
+      <button type="submit" class="cf-btn">
+        {ctaTexto}
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+
+      {/* Mensaje de estado — accesible */}
+      <div
+        class="cf-status"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      ></div>
+    </form>
+
+    {whatsappFallback && (
+      <p class="contacto-form__wa-alt">
+        ¿Prefieres escribir directo?{' '}
+        <a
+          href={`https://api.whatsapp.com/send?phone=521${whatsappFallback.replace(/\D/g, '')}&text=${encodeURIComponent('Hola, quisiera obtener información')}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="cf-link"
+        >
+          Escríbenos por WhatsApp
+        </a>
+      </p>
+    )}
+  </div>
+</section>
+
+<script>
+  // Feedback visual mínimo — submit del formulario
+  const forms = document.querySelectorAll('.contacto-form__form');
+
+  forms.forEach((form) => {
+    const status = form.querySelector('.cf-status') as HTMLElement;
+
+    form.addEventListener('submit', async (e) => {
+      const action = (form as HTMLFormElement).action;
+      if (!action || action === '#' || action === window.location.href) return;
+
+      e.preventDefault();
+      const btn = form.querySelector('.cf-btn') as HTMLButtonElement;
+      if (!btn) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+
+      try {
+        const res = await fetch(action, {
+          method: 'POST',
+          body: new FormData(form as HTMLFormElement),
+          headers: { Accept: 'application/json' },
+        });
+
+        if (res.ok) {
+          (form as HTMLFormElement).reset();
+          if (status) {
+            status.textContent = '¡Mensaje enviado! Te respondemos pronto.';
+            status.className = 'cf-status cf-status--ok';
+          }
+          btn.textContent = '✓ Enviado';
+        } else {
+          throw new Error('Error');
+        }
+      } catch {
+        if (status) {
+          status.textContent = 'Error al enviar. Intenta por WhatsApp.';
+          status.className = 'cf-status cf-status--err';
+        }
+        btn.disabled = false;
+        btn.textContent = 'Reintentar';
+      }
+    });
+  });
+</script>
+
+<style>
+  .contacto-form {
+    padding: clamp(4rem, 10vw, 7rem) clamp(1.25rem, 5vw, 3rem);
+    background-color: var(--color-surface);
+  }
+
+  .contacto-form__inner {
+    max-width: 42rem;
+    margin-inline: auto;
+  }
+
+  .contacto-form__header {
+    margin-bottom: 2.5rem;
+  }
+
+  .contacto-form__titulo {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin: 0 0 0.75rem;
+  }
+
+  .contacto-form__sub {
+    font-size: 1.0625rem;
+    color: oklch(from var(--color-text) l c h / 0.65);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .contacto-form__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.375rem;
+  }
+
+  .cf-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .cf-label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .cf-req {
+    color: var(--color-cta);
+    margin-left: 0.125rem;
+  }
+
+  .cf-hint {
+    font-size: 0.8125rem;
+    color: oklch(from var(--color-text) l c h / 0.5);
+  }
+
+  .cf-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--color-text);
+    background-color: oklch(from var(--color-surface) calc(l - 0.015) c h);
+    border: 1.5px solid oklch(from var(--color-text) l c h / 0.18);
+    border-radius: 0.5rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+  }
+
+  .cf-input:focus {
+    border-color: var(--color-cta);
+    box-shadow: 0 0 0 3px oklch(from var(--color-cta) l c h / 0.15);
+  }
+
+  .cf-input:invalid:not(:placeholder-shown) {
+    border-color: oklch(55% 0.22 25);
+  }
+
+  .cf-textarea {
+    resize: vertical;
+    min-height: 7rem;
+    line-height: 1.6;
+  }
+
+  .cf-select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    padding-right: 2.5rem;
+  }
+
+  /* Checkbox LFPDPPP */
+  .cf-campo--checkbox {
+    gap: 0;
+  }
+
+  .cf-checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+  }
+
+  .cf-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .cf-checkbox-custom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    min-width: 1.25rem;
+    border: 2px solid oklch(from var(--color-text) l c h / 0.3);
+    border-radius: 0.25rem;
+    background: white;
+    transition: border-color 0.2s, background-color 0.2s;
+    margin-top: 0.125rem;
+  }
+
+  .cf-checkbox:checked + .cf-checkbox-custom {
+    background-color: var(--color-cta);
+    border-color: var(--color-cta);
+  }
+
+  .cf-checkbox:checked + .cf-checkbox-custom::after {
+    content: '';
+    display: block;
+    width: 0.4rem;
+    height: 0.7rem;
+    border: 2px solid white;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translateY(-1px);
+  }
+
+  .cf-checkbox:focus-visible + .cf-checkbox-custom {
+    outline: 3px solid var(--color-cta);
+    outline-offset: 2px;
+  }
+
+  .cf-checkbox-texto {
+    font-size: 0.9rem;
+    color: oklch(from var(--color-text) l c h / 0.75);
+    line-height: 1.55;
+  }
+
+  .cf-link {
+    color: var(--color-cta);
+    text-underline-offset: 3px;
+    font-weight: 600;
+  }
+
+  .cf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    padding: 0.9375rem 2rem;
+    background-color: var(--color-cta);
+    color: oklch(99% 0.005 230);
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: inherit;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.15s;
+  }
+
+  .cf-btn:hover:not(:disabled) {
+    background-color: var(--color-cta-hover);
+    transform: translateY(-1px);
+  }
+
+  .cf-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+
+  .cf-btn:focus-visible {
+    outline: 3px solid var(--color-cta);
+    outline-offset: 4px;
+  }
+
+  /* Mensajes de estado */
+  .cf-status {
+    font-size: 0.9375rem;
+    padding: 0;
+    min-height: 0;
+    transition: all 0.2s;
+  }
+
+  .cf-status--ok {
+    padding: 1rem;
+    background-color: oklch(92% 0.1 145);
+    color: oklch(30% 0.12 145);
+    border-radius: 0.5rem;
+    font-weight: 600;
+  }
+
+  .cf-status--err {
+    padding: 1rem;
+    background-color: oklch(93% 0.1 25);
+    color: oklch(40% 0.18 25);
+    border-radius: 0.5rem;
+    font-weight: 600;
+  }
+
+  .contacto-form__wa-alt {
+    margin-top: 1.5rem;
+    font-size: 0.9375rem;
+    color: oklch(from var(--color-text) l c h / 0.65);
+    text-align: center;
+  }
+</style>

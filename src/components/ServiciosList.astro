@@ -1,0 +1,106 @@
+---
+interface Servicio {
+  nombre: string;
+  precio: number;
+  descripcion?: string;
+}
+
+interface Props {
+  servicios: Servicio[];
+  titulo?: string;
+  moneda?: string;
+}
+
+const { servicios, titulo = 'Servicios', moneda = '$' } = Astro.props;
+---
+
+<section class="servicios-list">
+  <div class="servicios-list__inner">
+    <h2 class="servicios-list__heading">{titulo}</h2>
+    <ul class="servicios-list__items" role="list">
+      {servicios.map((s) => (
+        <li class="servicios-list__item">
+          <div class="servicios-list__info">
+            <span class="servicios-list__nombre">{s.nombre}</span>
+            {s.descripcion && (
+              <span class="servicios-list__desc">{s.descripcion}</span>
+            )}
+          </div>
+          <span class="servicios-list__precio" aria-label={`Precio: ${moneda}${s.precio}`}>
+            {moneda}{s.precio.toLocaleString('es-MX')}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .servicios-list {
+    padding: clamp(4rem, 10vw, 7rem) clamp(1.25rem, 5vw, 3rem);
+    background-color: var(--color-surface);
+  }
+
+  .servicios-list__inner {
+    max-width: 48rem;
+    margin-inline: auto;
+  }
+
+  .servicios-list__heading {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin: 0 0 2.5rem;
+  }
+
+  .servicios-list__items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .servicios-list__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.125rem 0;
+    border-bottom: 1px solid oklch(from var(--color-text) l c h / 0.1);
+    transition: background-color 0.15s;
+  }
+
+  .servicios-list__item:first-child {
+    border-top: 1px solid oklch(from var(--color-text) l c h / 0.1);
+  }
+
+  .servicios-list__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .servicios-list__nombre {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .servicios-list__desc {
+    font-size: 0.875rem;
+    color: oklch(from var(--color-text) l c h / 0.6);
+    line-height: 1.5;
+  }
+
+  .servicios-list__precio {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-cta);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+</style>

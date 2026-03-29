@@ -1,0 +1,207 @@
+---
+/**
+ * ProcesoPasos.astro — Proceso en pasos horizontales numerados
+ * Zero JS. WCAG 2.2 AA.
+ * Uso: salud, comida, cualquier negocio con proceso claro
+ */
+
+interface Paso {
+  numero: number;
+  titulo: string;
+  descripcion: string;
+  icono?: string;
+}
+
+interface Props {
+  pasos: Paso[];
+  titulo?: string;
+  subtitulo?: string;
+  variante?: 'numeros' | 'iconos';
+}
+
+const {
+  pasos,
+  titulo = 'Así funciona',
+  subtitulo,
+  variante = 'numeros',
+} = Astro.props;
+---
+
+<section class="proceso-pasos" aria-labelledby="proceso-heading">
+  <div class="proceso-pasos__inner">
+    <header class="proceso-pasos__header">
+      <h2 class="proceso-pasos__titulo" id="proceso-heading">{titulo}</h2>
+      {subtitulo && <p class="proceso-pasos__sub">{subtitulo}</p>}
+    </header>
+
+    <ol class="proceso-pasos__lista" role="list">
+      {pasos.map((paso, i) => (
+        <li class="proceso-paso">
+          <div class="proceso-paso__indicador" aria-hidden="true">
+            {variante === 'iconos' && paso.icono
+              ? <span class="proceso-paso__icono">{paso.icono}</span>
+              : <span class="proceso-paso__num">{paso.numero}</span>
+            }
+            {i < pasos.length - 1 && (
+              <span class="proceso-paso__linea" aria-hidden="true"></span>
+            )}
+          </div>
+          <div class="proceso-paso__contenido">
+            <h3 class="proceso-paso__titulo">{paso.titulo}</h3>
+            <p class="proceso-paso__desc">{paso.descripcion}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .proceso-pasos {
+    padding: clamp(4rem, 10vw, 7rem) clamp(1.25rem, 5vw, 3rem);
+    background-color: var(--color-surface);
+  }
+
+  .proceso-pasos__inner {
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+
+  .proceso-pasos__header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .proceso-pasos__titulo {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin: 0 0 0.75rem;
+  }
+
+  .proceso-pasos__sub {
+    font-size: 1.0625rem;
+    color: oklch(from var(--color-text) l c h / 0.65);
+    line-height: 1.6;
+    max-width: 50ch;
+    margin: 0 auto;
+  }
+
+  .proceso-pasos__lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    gap: 0;
+    position: relative;
+  }
+
+  .proceso-paso {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 1.5rem;
+    position: relative;
+  }
+
+  .proceso-paso__indicador {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .proceso-paso__num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    background-color: var(--color-primary);
+    color: oklch(15% 0.02 270);
+    font-size: 1.5rem;
+    font-weight: 900;
+    border-radius: 50%;
+    flex-shrink: 0;
+    z-index: 1;
+    position: relative;
+  }
+
+  .proceso-paso__icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    background-color: oklch(from var(--color-primary) l c h / 0.12);
+    border: 2px solid var(--color-primary);
+    font-size: 1.75rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+    z-index: 1;
+    position: relative;
+  }
+
+  /* Línea conectora entre pasos */
+  .proceso-paso__linea {
+    position: absolute;
+    top: 50%;
+    left: calc(50% + 1.75rem);
+    right: calc(-50% + 1.75rem);
+    height: 2px;
+    background: linear-gradient(
+      to right,
+      var(--color-primary),
+      oklch(from var(--color-primary) l c h / 0.3)
+    );
+    transform: translateY(-50%);
+  }
+
+  .proceso-paso__contenido {
+    flex: 1;
+  }
+
+  .proceso-paso__titulo {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 0.5rem;
+  }
+
+  .proceso-paso__desc {
+    font-size: 0.9rem;
+    color: oklch(from var(--color-text) l c h / 0.7);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .proceso-pasos__lista {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .proceso-paso {
+      flex-direction: row;
+      text-align: left;
+      align-items: flex-start;
+      gap: 1.25rem;
+      padding: 0;
+    }
+
+    .proceso-paso__indicador {
+      width: auto;
+      margin-bottom: 0;
+      flex-shrink: 0;
+    }
+
+    .proceso-paso__linea {
+      display: none;
+    }
+  }
+</style>

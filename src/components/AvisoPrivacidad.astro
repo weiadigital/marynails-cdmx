@@ -1,0 +1,291 @@
+---
+/**
+ * AvisoPrivacidad.astro — Template LFPDPPP 2025
+ * Incluye cláusula de uso de IA obligatoria para Son.ia / ADI
+ * 
+ * USO: Copiar como src/pages/aviso-de-privacidad.astro
+ * y reemplazar las variables entre [CORCHETES]
+ */
+
+interface Props {
+  negocio: string;
+  rfc?: string;
+  domicilio: string;
+  email: string;
+  telefono: string;
+  usaIA?: boolean;
+  nombreIA?: string;
+  fechaActualizacion?: string;
+}
+
+const {
+  negocio,
+  rfc,
+  domicilio,
+  email,
+  telefono,
+  usaIA = true,
+  nombreIA = 'Son.ia',
+  fechaActualizacion = new Date().toLocaleDateString('es-MX', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }),
+} = Astro.props;
+---
+
+<article class="aviso" itemscope itemtype="https://schema.org/WebPage">
+  <div class="aviso__inner">
+    <header class="aviso__header">
+      <h1 class="aviso__title">Aviso de Privacidad</h1>
+      <p class="aviso__meta">Última actualización: {fechaActualizacion}</p>
+    </header>
+
+    <section class="aviso__section">
+      <h2>1. Responsable del Tratamiento</h2>
+      <p>
+        <strong>{negocio}</strong>{rfc && `, con RFC ${rfc},`} con domicilio en{' '}
+        {domicilio}, es responsable del tratamiento de sus datos personales, en
+        términos de lo dispuesto por la Ley Federal de Protección de Datos
+        Personales en Posesión de los Particulares (LFPDPPP) y su Reglamento.
+      </p>
+      <p>
+        Para cualquier consulta relacionada con este Aviso de Privacidad, puede
+        contactarnos en:
+      </p>
+      <ul>
+        <li>Correo electrónico: <a href={`mailto:${email}`}>{email}</a></li>
+        <li>Teléfono / WhatsApp: {telefono}</li>
+      </ul>
+    </section>
+
+    <section class="aviso__section">
+      <h2>2. Datos Personales que Recabamos</h2>
+      <p>Recabamos los siguientes datos personales:</p>
+      <ul>
+        <li><strong>Datos de identificación:</strong> nombre completo, teléfono, correo electrónico.</li>
+        <li><strong>Datos de contacto:</strong> dirección física (cuando aplique).</li>
+        <li><strong>Datos de navegación:</strong> dirección IP, cookies analíticas (con su consentimiento previo).</li>
+      </ul>
+      <p>No recabamos datos personales sensibles.</p>
+    </section>
+
+    <section class="aviso__section">
+      <h2>3. Finalidades del Tratamiento</h2>
+      <p><strong>Finalidades primarias (necesarias):</strong></p>
+      <ul>
+        <li>Atender sus solicitudes de información, cotización o servicio.</li>
+        <li>Brindar seguimiento post-servicio.</li>
+        <li>Emitir comprobantes fiscales cuando aplique.</li>
+      </ul>
+      <p><strong>Finalidades secundarias (requieren consentimiento):</strong></p>
+      <ul>
+        <li>Envío de promociones y novedades.</li>
+        <li>Análisis estadístico del comportamiento en el sitio web (Google Analytics 4).</li>
+      </ul>
+      <p>
+        Si no desea que sus datos sean tratados para las finalidades secundarias,
+        comuníquelo a través de los medios señalados en la sección 1.
+      </p>
+    </section>
+
+    {usaIA && (
+      <section class="aviso__section aviso__section--ia">
+        <h2>4. Uso de Inteligencia Artificial (Obligatorio LFPDPPP 2025)</h2>
+        <div class="aviso__ia-box" role="note">
+          <p>
+            Este negocio utiliza un <strong>Asistente Digital Inteligente</strong>{' '}
+            denominado <strong>"{nombreIA}"</strong>, impulsado por tecnología de
+            Inteligencia Artificial (IA), para atender consultas a través de
+            canales como WhatsApp, Telegram u otros medios de comunicación digital.
+          </p>
+          <p>
+            <strong>En todo momento:</strong>
+          </p>
+          <ul>
+            <li>
+              {nombreIA} es una IA, no un ser humano. Si en algún momento no tiene
+              certeza de si está hablando con una persona o con una IA, tiene el
+              derecho de preguntar y recibirá una respuesta veraz.
+            </li>
+            <li>
+              Puede solicitar ser transferido a un representante humano en
+              cualquier momento.
+            </li>
+            <li>
+              Las conversaciones pueden ser almacenadas con fines de mejora del
+              servicio y cumplimiento legal, de conformidad con este Aviso.
+            </li>
+            <li>
+              Ninguna decisión que le afecte legalmente será tomada exclusivamente
+              por la IA sin intervención humana.
+            </li>
+          </ul>
+          <p>
+            El uso de este asistente se rige por los principios de licitud,
+            consentimiento, información, calidad, finalidad, lealtad,
+            proporcionalidad y responsabilidad establecidos en la LFPDPPP.
+          </p>
+        </div>
+      </section>
+    )}
+
+    <section class="aviso__section">
+      <h2>{usaIA ? '5' : '4'}. Transferencia de Datos</h2>
+      <p>
+        Sus datos personales no serán transferidos a terceros sin su
+        consentimiento, salvo en los casos previstos por el artículo 37 de la
+        LFPDPPP (autoridades competentes, por obligación legal).
+      </p>
+      <p>
+        Para la operación del asistente digital y el sitio web, utilizamos
+        proveedores tecnológicos bajo estándares de seguridad equivalentes a los
+        exigidos por la LFPDPPP.
+      </p>
+    </section>
+
+    <section class="aviso__section">
+      <h2>{usaIA ? '6' : '5'}. Derechos ARCO</h2>
+      <p>
+        Usted tiene derecho a <strong>Acceder, Rectificar, Cancelar u Oponerse</strong>{' '}
+        (derechos ARCO) al tratamiento de sus datos personales. Para ejercerlos,
+        envíe un correo a <a href={`mailto:${email}`}>{email}</a> con:
+      </p>
+      <ul>
+        <li>Su nombre completo y datos de contacto.</li>
+        <li>Descripción clara del derecho que desea ejercer.</li>
+        <li>Copia de identificación oficial.</li>
+      </ul>
+      <p>
+        Responderemos en un plazo máximo de <strong>20 días hábiles</strong>{' '}
+        contados desde la recepción de su solicitud.
+      </p>
+    </section>
+
+    <section class="aviso__section">
+      <h2>{usaIA ? '7' : '6'}. Cookies y Tecnologías de Rastreo</h2>
+      <p>
+        Este sitio utiliza cookies analíticas (Google Analytics 4) únicamente con
+        su consentimiento previo, otorgado a través del banner de cookies que
+        aparece en su primera visita. Puede revocar este consentimiento en
+        cualquier momento desde la configuración del sitio o de su navegador.
+      </p>
+    </section>
+
+    <section class="aviso__section">
+      <h2>{usaIA ? '8' : '7'}. Cambios al Aviso de Privacidad</h2>
+      <p>
+        Podemos actualizar este Aviso en cualquier momento. Los cambios se
+        publicarán en esta página con la fecha de actualización. Le recomendamos
+        revisarlo periódicamente.
+      </p>
+    </section>
+
+    <section class="aviso__section">
+      <h2>{usaIA ? '9' : '8'}. Autoridad Competente</h2>
+      <p>
+        Si considera que sus derechos han sido vulnerados, puede presentar una
+        queja ante la <strong>Secretaría de Anticorrupción y Buen Gobierno</strong>,
+        autoridad competente en materia de protección de datos personales desde
+        marzo de 2025, en{' '}
+        <a
+          href="https://www.gob.mx/sacg"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          www.gob.mx/sacg
+        </a>.
+      </p>
+    </section>
+  </div>
+</article>
+
+<style>
+  .aviso {
+    padding: clamp(3rem, 8vw, 6rem) clamp(1.25rem, 5vw, 3rem);
+    background-color: var(--color-surface);
+  }
+
+  .aviso__inner {
+    max-width: 50rem;
+    margin-inline: auto;
+  }
+
+  .aviso__header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid var(--color-primary);
+  }
+
+  .aviso__title {
+    font-size: clamp(1.875rem, 5vw, 2.75rem);
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    color: var(--color-text);
+    margin: 0 0 0.5rem;
+  }
+
+  .aviso__meta {
+    font-size: 0.875rem;
+    color: oklch(from var(--color-text) l c h / 0.55);
+    margin: 0;
+  }
+
+  .aviso__section {
+    margin-bottom: 2.5rem;
+  }
+
+  .aviso__section h2 {
+    font-size: 1.1875rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 1rem;
+    padding-left: 0.875rem;
+    border-left: 3px solid var(--color-primary);
+  }
+
+  .aviso__section p {
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    color: oklch(from var(--color-text) l c h / 0.8);
+    margin: 0 0 0.875rem;
+  }
+
+  .aviso__section ul {
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    color: oklch(from var(--color-text) l c h / 0.8);
+    margin: 0 0 0.875rem;
+    padding-left: 1.5rem;
+  }
+
+  .aviso__section li {
+    margin-bottom: 0.375rem;
+  }
+
+  .aviso__section a {
+    color: var(--color-cta);
+    text-underline-offset: 3px;
+  }
+
+  .aviso__section a:hover {
+    opacity: 0.8;
+  }
+
+  /* Cláusula IA — destacada */
+  .aviso__section--ia {
+    background-color: oklch(from var(--color-primary) l c h / 0.07);
+    border: 1px solid oklch(from var(--color-primary) l c h / 0.2);
+    border-radius: 1rem;
+    padding: 2rem;
+  }
+
+  .aviso__section--ia h2 {
+    border-left-color: var(--color-cta);
+    color: var(--color-text);
+  }
+
+  .aviso__ia-box p {
+    color: oklch(from var(--color-text) l c h / 0.85);
+  }
+</style>

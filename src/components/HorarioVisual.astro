@@ -1,0 +1,100 @@
+---
+/**
+ * HorarioVisual.astro — Tabla de horario semanal detallada
+ * Lista visual día por día con estado abierto/cerrado.
+ * Zero JS. WCAG 2.2 AA.
+ * Uso: T5-LocalUrgente. Negocios con horario físico relevante.
+ *
+ * INSTRUCCIÓN PARA MIXTLI:
+ * Horario OBLIGATORIO en T5 — si el cliente no lo proporcionó, preguntar.
+ * No omitir este componente en T5. No inventar horarios.
+ */
+
+interface Dia {
+  dia: string;        // "Lunes", "Martes", etc.
+  horas: string;      // "9:00 - 20:00" o "9-20h"
+  cerrado?: boolean;  // true si está cerrado ese día
+}
+
+interface Props {
+  dias: Dia[];
+  titulo?: string;
+}
+
+const {
+  dias,
+  titulo = 'Horario de atención',
+} = Astro.props;
+---
+
+<section class="horario-visual" aria-label={titulo}>
+  <div class="horario-visual__inner">
+    <h2 class="horario-visual__titulo">{titulo}</h2>
+    <ul class="horario-visual__tabla" role="list">
+      {dias.map((d) => (
+        <li class={`horario-visual__fila${d.cerrado ? ' horario-visual__fila--cerrado' : ''}`}>
+          <span class="horario-visual__dia">{d.dia}</span>
+          <span class="horario-visual__horas">
+            {d.cerrado ? 'Cerrado' : d.horas}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .horario-visual {
+    padding: clamp(3.5rem, 8vw, 5.5rem) clamp(1.25rem, 5vw, 3rem);
+    background-color: var(--color-surface);
+  }
+
+  .horario-visual__inner {
+    max-width: 36rem;
+    margin-inline: auto;
+  }
+
+  .horario-visual__titulo {
+    font-size: clamp(1.5rem, 3.5vw, 2rem);
+    font-weight: 800;
+    color: var(--color-text);
+    margin: 0 0 1.75rem;
+    letter-spacing: -0.02em;
+    font-family: var(--font-heading, inherit);
+  }
+
+  .horario-visual__tabla {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .horario-visual__fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid oklch(from var(--color-text) l c h / 0.08);
+    font-size: 0.9375rem;
+  }
+
+  .horario-visual__fila:first-child {
+    border-top: 1px solid oklch(from var(--color-text) l c h / 0.08);
+  }
+
+  .horario-visual__dia {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .horario-visual__horas {
+    color: oklch(from var(--color-text) l c h / 0.7);
+  }
+
+  .horario-visual__fila--cerrado .horario-visual__dia,
+  .horario-visual__fila--cerrado .horario-visual__horas {
+    opacity: 0.4;
+  }
+</style>

@@ -1,0 +1,206 @@
+---
+/**
+ * FAQAccordion.astro — Preguntas frecuentes
+ * Usa <details>/<summary> nativo del navegador — ZERO JavaScript
+ * WCAG 2.2 AA: semántica nativa, focus visible, contraste
+ * SEO: markup FAQ schema.org listo para rich results
+ */
+
+interface Pregunta {
+  pregunta: string;
+  respuesta: string;
+}
+
+interface Props {
+  preguntas: Pregunta[];
+  titulo?: string;
+  abiertaInicio?: number; // índice de la pregunta abierta por defecto (0-based)
+}
+
+const {
+  preguntas,
+  titulo = 'Preguntas frecuentes',
+  abiertaInicio,
+} = Astro.props;
+---
+
+<section
+  class="faq"
+  itemscope
+  itemtype="https://schema.org/FAQPage"
+  aria-labelledby="faq-heading"
+>
+  <div class="faq__inner">
+    <h2 class="faq__heading" id="faq-heading">{titulo}</h2>
+    <dl class="faq__list">
+      {preguntas.map((p, i) => (
+        <div
+          class="faq__item"
+          itemscope
+          itemprop="mainEntity"
+          itemtype="https://schema.org/Question"
+        >
+          <details open={abiertaInicio === i || undefined}>
+            <summary class="faq__pregunta" itemprop="name">
+              <span class="faq__pregunta-texto">{p.pregunta}</span>
+              <span class="faq__icono" aria-hidden="true"></span>
+            </summary>
+            <div
+              class="faq__respuesta"
+              itemscope
+              itemprop="acceptedAnswer"
+              itemtype="https://schema.org/Answer"
+            >
+              <p itemprop="text">{p.respuesta}</p>
+            </div>
+          </details>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<style>
+  .faq {
+    padding: clamp(4rem, 10vw, 7rem) clamp(1.25rem, 5vw, 3rem);
+    background-color: oklch(from var(--color-surface) calc(l - 0.015) c h);
+  }
+
+  .faq__inner {
+    max-width: 52rem;
+    margin-inline: auto;
+  }
+
+  .faq__heading {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin: 0 0 3rem;
+  }
+
+  .faq__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .faq__item {
+    border-bottom: 1px solid oklch(from var(--color-text) l c h / 0.1);
+  }
+
+  .faq__item:first-child {
+    border-top: 1px solid oklch(from var(--color-text) l c h / 0.1);
+  }
+
+  /* summary reset + estilo */
+  .faq__pregunta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.375rem 0;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: color 0.15s;
+  }
+
+  /* Ocultar el triángulo nativo en todos los navegadores */
+  .faq__pregunta::-webkit-details-marker { display: none; }
+  .faq__pregunta::marker { display: none; }
+
+  .faq__pregunta:hover {
+    color: var(--color-cta);
+  }
+
+  /* Focus visible — WCAG 2.2 AA */
+  .faq__pregunta:focus-visible {
+    outline: 2px solid var(--color-cta);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .faq__pregunta-texto {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--color-text);
+    line-height: 1.4;
+    flex: 1;
+    transition: color 0.15s;
+  }
+
+  details[open] .faq__pregunta-texto {
+    color: var(--color-cta);
+  }
+
+  /* Ícono +/× via CSS — zero SVG, zero JS */
+  .faq__icono {
+    position: relative;
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .faq__icono::before,
+  .faq__icono::after {
+    content: '';
+    position: absolute;
+    background-color: var(--color-cta);
+    border-radius: 2px;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+  }
+
+  /* línea horizontal (siempre visible) */
+  .faq__icono::before {
+    width: 100%;
+    height: 2px;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+  }
+
+  /* línea vertical (visible cuando cerrado) */
+  .faq__icono::after {
+    width: 2px;
+    height: 100%;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Cuando abierto: rotar vertical → horizontal (forma X o solo - según preferencia) */
+  details[open] .faq__icono::after {
+    transform: translateX(-50%) rotate(90deg);
+    opacity: 0;
+  }
+
+  /* Respuesta */
+  .faq__respuesta {
+    padding-bottom: 1.375rem;
+  }
+
+  .faq__respuesta p {
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    color: oklch(from var(--color-text) l c h / 0.78);
+    margin: 0;
+    max-width: 62ch;
+  }
+
+  /* Animación de apertura — solo si el navegador soporta interpolate-size */
+  @supports (interpolate-size: allow-keywords) {
+    details {
+      interpolate-size: allow-keywords;
+    }
+
+    .faq__respuesta {
+      overflow: hidden;
+    }
+
+    details:not([open]) .faq__respuesta {
+      height: 0;
+      padding-bottom: 0;
+    }
+  }
+</style>

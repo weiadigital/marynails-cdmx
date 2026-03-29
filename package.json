@@ -1,0 +1,20 @@
+{
+  "name": "mixtli-template",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "astro": "^6.0.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.8",
+    "typescript": "^5.0.0",
+    "wrangler": "^3.0.0"
+  }
+}

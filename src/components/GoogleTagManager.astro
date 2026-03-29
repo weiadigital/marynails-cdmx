@@ -1,0 +1,61 @@
+---
+/**
+ * GoogleTagManager.astro — GTM para toda landing Mixtli
+ * Dos snippets: head (script) + body (noscript iframe)
+ * Solo se activa en producción. CSP compatible.
+ * LFPDPPP: GTM se carga siempre pero los tags dentro de GTM
+ * solo deben dispararse tras consentimiento en CookieConsent.
+ *
+ * USO en BaseLayout.astro:
+ *   import GTM from '../components/GoogleTagManager.astro'
+ *   En <head>: <GTM.Head gtmId={gtmId} />
+ *   Después de <body>: <GTM.Body gtmId={gtmId} />
+ *
+ * O usar el componente completo (incluye ambos):
+ *   <GoogleTagManager gtmId="GTM-XXXXXXX" />
+ */
+
+interface Props {
+  gtmId: string; // formato: GTM-XXXXXXX
+  soloProduccion?: boolean;
+}
+
+const {
+  gtmId,
+  soloProduccion = true,
+} = Astro.props;
+
+const activo = soloProduccion ? import.meta.env.PROD : true;
+---
+
+{activo && gtmId && (
+  <>
+    {/* Snippet HEAD — va dentro de <head> lo más arriba posible */}
+    <script is:inline define:vars={{ gtmId }}>
+      (function(w,d,s,l,i){
+        w[l]=w[l]||[];
+        w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
+        var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),
+            dl=l!='dataLayer'?'&l='+l:'';
+        j.async=true;
+        j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+        f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer', gtmId);
+    </script>
+
+    {/* Snippet BODY — va inmediatamente después de <body> */}
+    {/* NOTA: En Astro no podemos inyectar justo después de <body> */}
+    {/* Este noscript va como fallback accesible */}
+    <noscript>
+      <iframe
+        src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"
+        title="Google Tag Manager"
+        aria-hidden="true"
+      ></iframe>
+    </noscript>
+  </>
+)}

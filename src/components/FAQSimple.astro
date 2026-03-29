@@ -1,0 +1,116 @@
+---
+/**
+ * FAQSimple.astro — FAQ con respuestas siempre visibles
+ * Zero JS. WCAG 2.2 AA. Schema.org FAQPage.
+ * Uso: barberías, comida — preguntas operativas cortas
+ */
+
+interface Pregunta {
+  pregunta: string;
+  respuesta: string;
+}
+
+interface Props {
+  preguntas: Pregunta[];
+  titulo?: string;
+  columnas?: 1 | 2;
+}
+
+const {
+  preguntas,
+  titulo = 'Preguntas frecuentes',
+  columnas = 1,
+} = Astro.props;
+---
+
+<section
+  class="faq-simple"
+  itemscope
+  itemtype="https://schema.org/FAQPage"
+  aria-labelledby="faq-simple-heading"
+>
+  <div class="faq-simple__inner">
+    <h2 class="faq-simple__heading" id="faq-simple-heading">{titulo}</h2>
+    <ul
+      class="faq-simple__list"
+      role="list"
+      style={`--cols: ${columnas}`}
+    >
+      {preguntas.map((p) => (
+        <li
+          class="faq-simple__item"
+          itemscope
+          itemprop="mainEntity"
+          itemtype="https://schema.org/Question"
+        >
+          <h3 class="faq-simple__pregunta" itemprop="name">{p.pregunta}</h3>
+          <div
+            itemscope
+            itemprop="acceptedAnswer"
+            itemtype="https://schema.org/Answer"
+          >
+            <p class="faq-simple__respuesta" itemprop="text">{p.respuesta}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .faq-simple {
+    padding: clamp(4rem, 10vw, 7rem) clamp(1.25rem, 5vw, 3rem);
+    background-color: var(--color-surface);
+  }
+
+  .faq-simple__inner {
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+
+  .faq-simple__heading {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin: 0 0 3rem;
+    text-align: center;
+  }
+
+  .faq-simple__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 1), 1fr);
+    gap: 1.75rem;
+  }
+
+  .faq-simple__item {
+    padding: 1.75rem;
+    background-color: oklch(from var(--color-surface) calc(l - 0.02) c h);
+    border-left: 3px solid var(--color-primary);
+    border-radius: 0 0.75rem 0.75rem 0;
+  }
+
+  .faq-simple__pregunta {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 0.625rem;
+    line-height: 1.4;
+  }
+
+  .faq-simple__respuesta {
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    color: oklch(from var(--color-text) l c h / 0.75);
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .faq-simple__list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

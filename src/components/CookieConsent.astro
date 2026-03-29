@@ -1,0 +1,165 @@
+---
+/**
+ * CookieConsent.astro — Banner de cookies LFPDPPP 2025
+ * Usa vanilla-cookieconsent v3 (MIT) — JS mínimo, bloqueante cargado diferido
+ * Bloquea GA4 hasta que el usuario acepta (categoría 'analytics')
+ * 
+ * USO: Incluir en BaseLayout.astro dentro de <head> o antes de </body>
+ * El script de GA4 usa window.dataLayer y solo se activa tras consentimiento.
+ */
+
+interface Props {
+  negocio: string;
+  avisoUrl?: string;
+  gaId?: string; // ej. 'G-XXXXXXXXXX'
+}
+
+const {
+  negocio,
+  avisoUrl = '/aviso-de-privacidad',
+  gaId,
+} = Astro.props;
+---
+
+<!-- vanilla-cookieconsent v3 — CDN jsDelivr (CSP-safe) -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3/dist/cookieconsent.css"
+/>
+
+<script
+  is:inline
+  define:vars={{ negocio, avisoUrl, gaId }}
+>
+  // Carga diferida — no bloquea el render
+  window.addEventListener('load', () => {
+    import('https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3/dist/cookieconsent.esm.js')
+      .then(({ run }) => {
+        run({
+          guiOptions: {
+            consentModal: {
+              layout: 'bar',
+              position: 'bottom',
+              equalWeightButtons: false,
+              flipButtons: false,
+            },
+            preferencesModal: {
+              layout: 'box',
+              position: 'right',
+            },
+          },
+
+          categories: {
+            necessary: {
+              enabled: true,
+              readOnly: true,
+            },
+            analytics: {
+              enabled: false,
+              autoClear: {
+                cookies: [
+                  { name: /^(_ga|_gid|_gat)/ },
+                ],
+              },
+              onAccept: () => {
+                // Activar GA4 solo tras consentimiento
+                if (gaId && typeof window !== 'undefined') {
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag() { window.dataLayer.push(arguments); }
+                  gtag('js', new Date());
+                  gtag('config', gaId, {
+                    anonymize_ip: true,
+                    cookie_flags: 'SameSite=None;Secure',
+                  });
+
+                  const script = document.createElement('script');
+                  script.async = true;
+                  script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+                  document.head.appendChild(script);
+                }
+              },
+            },
+          },
+
+          language: {
+            default: 'es',
+            translations: {
+              es: {
+                consentModal: {
+                  title: 'Usamos cookies',
+                  description: `${negocio} usa cookies analíticas (Google Analytics 4) con tu consentimiento previo. Las cookies necesarias para el funcionamiento del sitio siempre están activas. <a href="${avisoUrl}" class="cc__link">Aviso de Privacidad</a>.`,
+                  acceptAllBtn: 'Aceptar todas',
+                  acceptNecessaryBtn: 'Solo necesarias',
+                  showPreferencesBtn: 'Gestionar preferencias',
+                },
+                preferencesModal: {
+                  title: 'Preferencias de cookies',
+                  acceptAllBtn: 'Aceptar todas',
+                  acceptNecessaryBtn: 'Solo necesarias',
+                  savePreferencesBtn: 'Guardar preferencias',
+                  closeIconLabel: 'Cerrar',
+                  serviceCounterLabel: 'Servicio|Servicios',
+                  sections: [
+                    {
+                      title: 'Cookies necesarias',
+                      description: 'Indispensables para el funcionamiento del sitio. No pueden desactivarse.',
+                      linkedCategory: 'necessary',
+                    },
+                    {
+                      title: 'Cookies analíticas',
+                      description: 'Nos ayudan a entender cómo usas el sitio (Google Analytics 4). Solo se activan con tu permiso. En ningún caso se venden tus datos.',
+                      linkedCategory: 'analytics',
+                      cookieTable: {
+                        caption: 'Cookies de Google Analytics',
+                        headers: {
+                          name: 'Cookie',
+                          domain: 'Dominio',
+                          desc: 'Descripción',
+                        },
+                        body: [
+                          { name: '_ga', domain: 'google.com', desc: 'Distingue usuarios únicos. Caduca en 2 años.' },
+                          { name: '_gid', domain: 'google.com', desc: 'Distingue sesiones. Caduca en 24 h.' },
+                        ],
+                      },
+                    },
+                    {
+                      title: 'Más información',
+                      description: `Puedes ejercer tus derechos ARCO o conocer más sobre el tratamiento de tus datos en nuestro <a href="${avisoUrl}" class="cc__link">Aviso de Privacidad</a>.`,
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        });
+      });
+  });
+</script>
+
+<style is:global>
+  /* Tokens OKLCH de Weia aplicados al banner */
+  :root {
+    --cc-btn-primary-bg: var(--color-cta, oklch(55% 0.25 350));
+    --cc-btn-primary-color: oklch(99% 0.005 230);
+    --cc-btn-primary-hover-bg: var(--color-cta-hover, oklch(60% 0.22 350));
+
+    --cc-btn-secondary-bg: oklch(from var(--color-surface, oklch(99% 0.005 230)) calc(l - 0.06) c h);
+    --cc-btn-secondary-color: var(--color-text, oklch(15% 0.02 270));
+    --cc-btn-secondary-hover-bg: oklch(from var(--color-surface, oklch(99% 0.005 230)) calc(l - 0.1) c h);
+
+    --cc-bg: var(--color-surface, oklch(99% 0.005 230));
+    --cc-primary-color: var(--color-text, oklch(15% 0.02 270));
+    --cc-secondary-color: oklch(from var(--color-text, oklch(15% 0.02 270)) l c h / 0.65);
+
+    --cc-modal-border-radius: 1rem;
+    --cc-btn-border-radius: 0.5rem;
+    --cc-font-family: inherit;
+
+    --cc-toggle-on-bg: var(--color-cta, oklch(55% 0.25 350));
+    --cc-toggle-off-bg: oklch(from var(--color-text, oklch(15% 0.02 270)) l c h / 0.2);
+    --cc-toggle-enabled-icon-color: oklch(99% 0.005 230);
+    --cc-toggle-readonly-bg: oklch(from var(--color-text, oklch(15% 0.02 270)) l c h / 0.12);
+
+    --cc-separator-border-color: oklch(from var(--color-text, oklch(15% 0.02 270)) l c h / 0.1);
+  }
+</style>

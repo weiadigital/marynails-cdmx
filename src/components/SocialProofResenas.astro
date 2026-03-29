@@ -1,0 +1,155 @@
+---
+interface Reseña {
+  nombre: string;
+  texto: string;
+  estrellas?: number;
+  cargo?: string;
+}
+
+interface Props {
+  reseñas: Reseña[];
+  titulo?: string;
+}
+
+const { reseñas, titulo = 'Lo que dicen nuestros clientes' } = Astro.props;
+---
+
+<section class="reseñas">
+  <div class="reseñas__inner">
+    <h2 class="reseñas__heading">{titulo}</h2>
+    <ul class="reseñas__grid" role="list">
+      {reseñas.map((r) => (
+        <li class="reseña-card">
+          {r.estrellas && (
+            <div class="reseña-card__stars" aria-label={`${r.estrellas} de 5 estrellas`} role="img">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <span class={i < r.estrellas! ? 'star star--on' : 'star star--off'} aria-hidden="true">★</span>
+              ))}
+            </div>
+          )}
+          <blockquote class="reseña-card__texto">
+            <p>"{r.texto}"</p>
+          </blockquote>
+          <footer class="reseña-card__footer">
+            <div class="reseña-card__avatar" aria-hidden="true">
+              {r.nombre.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <cite class="reseña-card__nombre">{r.nombre}</cite>
+              {r.cargo && <span class="reseña-card__cargo">{r.cargo}</span>}
+            </div>
+          </footer>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .reseñas {
+    padding: clamp(4rem, 10vw, 7rem) clamp(1.25rem, 5vw, 3rem);
+    background-color: var(--color-surface);
+    overflow: hidden;
+  }
+
+  .reseñas__inner {
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+
+  .reseñas__heading {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin: 0 0 3rem;
+    text-align: center;
+  }
+
+  .reseñas__grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: 1.5rem;
+  }
+
+  .reseña-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 2rem;
+    background-color: oklch(from var(--color-surface) calc(l - 0.02) c h);
+    border: 1px solid oklch(from var(--color-text) l c h / 0.08);
+    border-radius: 1.25rem;
+    border-top: 3px solid var(--color-primary);
+  }
+
+  .reseña-card__stars {
+    display: flex;
+    gap: 0.125rem;
+  }
+
+  .star {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .star--on {
+    color: oklch(78% 0.18 85);
+  }
+
+  .star--off {
+    color: oklch(80% 0.01 230);
+  }
+
+  .reseña-card__texto {
+    margin: 0;
+    flex: 1;
+  }
+
+  .reseña-card__texto p {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: oklch(from var(--color-text) l c h / 0.8);
+    margin: 0;
+    font-style: italic;
+  }
+
+  .reseña-card__footer {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    margin-top: auto;
+  }
+
+  .reseña-card__avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: oklch(15% 0.02 270);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .reseña-card__nombre {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    font-style: normal;
+    color: var(--color-text);
+    display: block;
+  }
+
+  .reseña-card__cargo {
+    font-size: 0.8125rem;
+    color: oklch(from var(--color-text) l c h / 0.55);
+    display: block;
+    margin-top: 0.125rem;
+  }
+</style>

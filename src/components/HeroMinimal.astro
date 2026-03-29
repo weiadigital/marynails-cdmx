@@ -1,0 +1,117 @@
+---
+interface Props {
+  titulo: string;
+  subtitulo?: string;
+  ctaTexto: string;
+  ctaUrl: string;
+  badge?: string;
+}
+
+const { titulo, subtitulo, ctaTexto, ctaUrl, badge } = Astro.props;
+---
+
+<section class="hero-minimal">
+  <div class="hero-minimal__inner">
+    {badge && <span class="hero-minimal__badge">{badge}</span>}
+    <h1 class="hero-minimal__title">{titulo}</h1>
+    {subtitulo && <p class="hero-minimal__sub">{subtitulo}</p>}
+    <a href={ctaUrl} class="hero-minimal__cta">{ctaTexto}</a>
+  </div>
+  <div class="hero-minimal__accent" aria-hidden="true"></div>
+</section>
+
+<style>
+  .hero-minimal {
+    position: relative;
+    min-height: clamp(28rem, 70svh, 52rem);
+    display: flex;
+    align-items: center;
+    background-color: var(--color-surface);
+    overflow: hidden;
+  }
+
+  .hero-minimal__inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: clamp(4rem, 10vw, 8rem) clamp(1.25rem, 5vw, 3rem);
+  }
+
+  .hero-minimal__badge {
+    display: inline-block;
+    padding: 0.25rem 0.875rem;
+    background-color: var(--color-primary);
+    color: oklch(15% 0.02 270);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-minimal__title {
+    font-size: clamp(2.25rem, 6vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    color: var(--color-text);
+    margin: 0 0 1.25rem;
+    max-width: 20ch;
+    text-wrap: balance;
+  }
+
+  .hero-minimal__sub {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: oklch(from var(--color-text) l c h / 0.7);
+    line-height: 1.65;
+    max-width: 50ch;
+    margin: 0 0 2.5rem;
+  }
+
+  .hero-minimal__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2.25rem;
+    background-color: var(--color-text);
+    color: var(--color-surface);
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+
+  .hero-minimal__cta::after {
+    content: "→";
+    font-size: 1.1em;
+    transition: transform 0.2s;
+  }
+
+  .hero-minimal__cta:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+  }
+
+  .hero-minimal__cta:hover::after {
+    transform: translateX(3px);
+  }
+
+  .hero-minimal__accent {
+    position: absolute;
+    top: -10%;
+    right: -5%;
+    width: clamp(18rem, 45vw, 36rem);
+    aspect-ratio: 1;
+    background: radial-gradient(
+      ellipse at center,
+      oklch(from var(--color-primary) l c h / 0.18) 0%,
+      transparent 70%
+    );
+    border-radius: 50%;
+    pointer-events: none;
+  }
+</style>

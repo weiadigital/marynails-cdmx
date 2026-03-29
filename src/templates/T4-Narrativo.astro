@@ -1,0 +1,240 @@
+---
+/**
+ * T4 — Narrativo
+ * Intención: "Tenemos historia y personalidad — quiero que la sientan"
+ * Sectores default: belleza/spa, nail salon premium, comida artesanal
+ * Estructura: Hero cinema 70vh → Historia/quiénes somos → ServiciosTabbed
+ *             → Galería → Testimonios → CTA color → Contacto + Mapa → Footer
+ *
+ * INSTRUCCIONES PARA SOF.IA:
+ * 1. La sección "Historia" usa una cita o frase del dueño extraída del briefing
+ *    (campo "especial" o descripción). Si no hay nada personal, omitir esta sección
+ *    y pasar directo a ServiciosTabbed.
+ * 2. ServiciosTabbed: agrupar servicios en categorías lógicas.
+ *    Spa: "Faciales | Masajes | Manos y pies"
+ *    Nail: "Manos | Pies | Diseño especial"
+ *    Restaurante: "Entradas | Platos fuertes | Postres"
+ * 3. El HeroCinema es compacto (70vh) para que el contenido debajo
+ *    sea accesible rápido. NO usar min-height: 100svh en este template.
+ * 4. CTA variante 'color' usa --color-primary como fondo.
+ *    Verificar contraste del texto sobre ese color.
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroCinema from '../components/HeroCinema.astro';
+import HistoriaFilosofia from '../components/HistoriaFilosofia.astro';
+import ServiciosTabbed from '../components/ServiciosTabbed.astro';
+import Gallery from '../components/Gallery.astro';
+import SocialProofResenas from '../components/SocialProofResenas.astro';
+import CTAPrincipal from '../components/CTAPrincipal.astro';
+import ContactoWhatsApp from '../components/ContactoWhatsApp.astro';
+import Footer from '../components/Footer.astro';
+import GoogleTagManager from '../components/GoogleTagManager.astro';
+
+// ─── DATOS DEL CLIENTE ────────────────────────────────────────────────────────
+
+const negocio = {
+  nombre:      '[NOMBRE_NEGOCIO]',
+  descripcion: '[DESCRIPCION_1_ORACION]',
+  telefono:    '[10_DIGITOS_SIN_PREFIJO]',
+  whatsapp:    '[10_DIGITOS_SIN_PREFIJO]',
+  direccion:   '[DIRECCION_COMPLETA]',
+  ciudad:      '[CIUDAD_ALCALDIA]',
+  cp:          '[CODIGO_POSTAL]',
+  horario:     '[HORARIO_TEXTO]',
+  tipoSchema:  '[TIPO_SCHEMA]',
+  email:       undefined,
+  redes: [],
+};
+
+const seo = {
+  titulo:      '[TITULO_SEO_50_CHARS]',
+  descripcion: '[META_DESC_155_CHARS]',
+  canonicalUrl: 'https://[DOMINIO].vercel.app',
+  ogImagen:    'https://[DOMINIO].vercel.app/og-default.jpg',
+};
+
+const tokens = {
+  tokenPrimary:  '[TOKEN_PRIMARY_OKLCH]',
+  tokenSurface:  '[TOKEN_SURFACE_OKLCH]',
+  tokenText:     '[TOKEN_TEXT_OKLCH]',
+  tokenCta:      '[TOKEN_CTA_OKLCH]',
+};
+
+// Perfil de movimiento — derivado de Energía calculada del briefing
+// E 1-2 → 'subtle' | E 3-4 → 'fluid' | E 5 → 'expressive'
+const motionProfile = '[MOTION_PROFILE]' as 'subtle' | 'fluid' | 'expressive';
+
+const fuentes = {
+  heading: '[FUENTE_HEADING]',
+  body:    'Inter',
+};
+
+// ─── CONTENIDO ────────────────────────────────────────────────────────────────
+
+const hero = {
+  titulo:    '[HEADLINE_ASPIRACIONAL]',
+  subtitulo: '[SUBTITULO_SENSORIAL]',
+  // ej. "Donde cada detalle importa" o "Cocina de autor en el corazón de Coyoacán"
+  ctaTexto:  '[TEXTO_CTA]',
+  ctaUrl:    `https://api.whatsapp.com/send?phone=521${negocio.whatsapp}&text=${encodeURIComponent('Hola, quiero reservar')}`,
+  imagenSrc: '/images/hero.webp',
+  imagenAlt: '[DESC_ALT_REAL]',
+  telefono:  undefined, // T4 no muestra teléfono en hero — CTA simple
+};
+
+// Historia / quiénes somos
+// Si no hay info personal del dueño → poner tienHistoria: false
+const historia = {
+  tieneHistoria: true,
+  cita: '[FRASE_O_FILOSOFIA_DEL_NEGOCIO]',
+  // Extraída del campo "especial" o descripción del briefing
+  // ej. "Llevamos 8 años haciendo uñas que no solo se ven bonitas — se sienten bien"
+  autor: '[NOMBRE_DUEÑO_O_NEGOCIO]',
+  textoApoyo: '[PARRAFO_BREVE_HISTORIA_O_FILOSOFIA]',
+  imagenSrc: '/images/historia.webp',
+  imagenAlt: '[DESC_ALT_REAL]',
+};
+
+// Servicios por categorías — ADAPTAR al sector
+const categorias = [
+  {
+    nombre: '[CATEGORIA_1]',
+    icono: '[EMOJI]',
+    servicios: [
+      { nombre: '[SERV_1_1]', precio: 0, descripcion: '[DESC]', duracion: '[DURACION]' },
+      { nombre: '[SERV_1_2]', precio: 0 },
+    ],
+  },
+  {
+    nombre: '[CATEGORIA_2]',
+    icono: '[EMOJI]',
+    servicios: [
+      { nombre: '[SERV_2_1]', precio: 0, descripcion: '[DESC]' },
+    ],
+  },
+  {
+    nombre: '[CATEGORIA_3]',
+    icono: '[EMOJI]',
+    servicios: [
+      { nombre: '[SERV_3_1]', precio: 0 },
+    ],
+  },
+];
+
+const galeria = [
+  { src: '/images/galeria-1.webp', alt: '[ALT_1]' },
+  { src: '/images/galeria-2.webp', alt: '[ALT_2]' },
+  { src: '/images/galeria-3.webp', alt: '[ALT_3]' },
+  { src: '/images/galeria-4.webp', alt: '[ALT_4]' },
+  { src: '/images/galeria-5.webp', alt: '[ALT_5]' },
+];
+
+const resenas: { nombre: string; texto: string; estrellas: number }[] = [
+  // SOLO reales
+];
+
+const cta = {
+  titulo:    '[HEADLINE_CIERRE_NARRATIVO]',
+  subtitulo: '[SUBTITULO_CTA]',
+  ctaTexto:  '[TEXTO_CTA_RESERVA]',
+  ctaUrl:    hero.ctaUrl,
+};
+
+const mapsEmbed = '[URL_IFRAME_GOOGLE_MAPS]';
+const gtmId = '[GTM-XXXXXXX]';
+---
+
+{gtmId && <GoogleTagManager gtmId={gtmId} />}
+
+<BaseLayout
+  titulo={seo.titulo}
+  descripcion={seo.descripcion}
+  canonicalUrl={seo.canonicalUrl}
+  ogImagen={seo.ogImagen}
+  schema={{
+    nombre:      negocio.nombre,
+    descripcion: negocio.descripcion,
+    telefono:    negocio.telefono,
+    direccion:   negocio.direccion,
+    ciudad:      negocio.ciudad,
+    cp:          negocio.cp,
+    horario:     negocio.horario,
+    tipoNegocio: negocio.tipoSchema,
+  }}
+  telefono={negocio.whatsapp}
+  mensajeWa={`Hola, quiero reservar en ${negocio.nombre}`}
+  {...tokens}
+  motionProfile={motionProfile}
+  fuenteHeading={fuentes.heading}
+  fuenteBody={fuentes.body}
+>
+  {/* ── SECCIÓN 1: Hero cinema compacto (70vh) ── */}
+  <HeroCinema
+    titulo={hero.titulo}
+    subtitulo={hero.subtitulo}
+    ctaTexto={hero.ctaTexto}
+    ctaUrl={hero.ctaUrl}
+    imagenSrc={hero.imagenSrc}
+    imagenAlt={hero.imagenAlt}
+  />
+
+  {/* ── SECCIÓN 2: Historia / filosofía del negocio ── */}
+  {historia.tieneHistoria && (
+    <HistoriaFilosofia
+      cita={historia.cita}
+      autor={historia.autor}
+      textoApoyo={historia.textoApoyo}
+      imagenSrc={historia.imagenSrc}
+      imagenAlt={historia.imagenAlt}
+    />
+  )}
+
+  {/* ── SECCIÓN 3: Servicios por categorías ── */}
+  <ServiciosTabbed
+    categorias={categorias}
+    titulo="Lo que hacemos"
+  />
+
+  {/* ── SECCIÓN 4: Galería ── */}
+  <Gallery
+    imagenes={galeria}
+    titulo="Nuestro trabajo"
+    columnas={3}
+  />
+
+  {/* ── SECCIÓN 5: Testimonios (solo si hay reales) ── */}
+  {resenas.length > 0 && (
+    <SocialProofResenas
+      reseñas={resenas}
+      titulo="Lo que dicen nuestros clientes"
+    />
+  )}
+
+  {/* ── SECCIÓN 6: CTA con color primario ── */}
+  <CTAPrincipal
+    titulo={cta.titulo}
+    subtitulo={cta.subtitulo}
+    ctaTexto={cta.ctaTexto}
+    ctaUrl={cta.ctaUrl}
+    variante="color"
+  />
+
+  {/* ── SECCIÓN 7: Contacto + Mapa ── */}
+  <ContactoWhatsApp
+    telefono={negocio.whatsapp}
+    direccion={negocio.direccion}
+    horario={negocio.horario}
+    titulo="Visítanos"
+    googleMapsEmbed={mapsEmbed}
+  />
+
+  {/* ── SECCIÓN 8: Footer ── */}
+  <Footer
+    negocio={negocio.nombre}
+    direccion={negocio.direccion}
+    telefono={negocio.telefono}
+    redes={negocio.redes}
+  />
+</BaseLayout>
+

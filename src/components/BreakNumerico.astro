@@ -1,0 +1,75 @@
+---
+/**
+ * BreakNumerico.astro — Sección de dato impactante entre secciones
+ * Fondo: --color-primary. Número grande con sufijo y contexto.
+ * Zero JS. WCAG 2.2 AA.
+ * Uso: T1-CinemaVisual. SOLO con dato real y verificable.
+ *
+ * INSTRUCCIÓN PARA MIXTLI:
+ * El número debe ser real (años, clientes, cortes, procedimientos).
+ * Si no hay dato verificable → NO usar este componente. Omitir.
+ */
+
+interface Props {
+  numero: string;        // ej. "2,400" o "8"
+  sufijo: string;        // ej. "clientes atendidos" o "años de experiencia"
+  contexto?: string;     // ej. "en Iztapalapa" o "en el giro"
+  ariaNombre?: string;   // texto descriptivo para lectores de pantalla
+}
+
+const {
+  numero,
+  sufijo,
+  contexto,
+  ariaNombre,
+} = Astro.props;
+
+const ariaLabel = ariaNombre ?? `${numero} ${sufijo}${contexto ? ` ${contexto}` : ''}`;
+---
+
+<section class="break-numerico" aria-label={ariaLabel}>
+  <div class="break-numerico__inner">
+    <p class="break-numerico__num" aria-hidden="true">{numero}</p>
+    <p class="break-numerico__sufijo">{sufijo}</p>
+    {contexto && (
+      <p class="break-numerico__ctx">{contexto}</p>
+    )}
+  </div>
+</section>
+
+<style>
+  .break-numerico {
+    padding: clamp(4rem, 10vw, 7rem) clamp(1.25rem, 5vw, 3rem);
+    background-color: var(--color-primary);
+    text-align: center;
+  }
+
+  .break-numerico__inner {
+    max-width: 40rem;
+    margin-inline: auto;
+  }
+
+  /* Número grande — escala dramática obligatoria */
+  .break-numerico__num {
+    font-size: clamp(4rem, 14vw, 9rem);
+    font-weight: 900;
+    line-height: 1;
+    color: oklch(12% 0.02 270);
+    letter-spacing: -0.04em;
+    margin: 0;
+    font-family: var(--font-heading, inherit);
+  }
+
+  .break-numerico__sufijo {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: 700;
+    color: oklch(18% 0.03 270);
+    margin: 0.5rem 0 0.25rem;
+  }
+
+  .break-numerico__ctx {
+    font-size: 1rem;
+    color: oklch(25% 0.03 270 / 0.7);
+    margin: 0;
+  }
+</style>

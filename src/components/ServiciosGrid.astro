@@ -1,0 +1,130 @@
+---
+interface Servicio {
+  nombre: string;
+  precio: number;
+  descripcion?: string;
+  icono?: string;
+}
+
+interface Props {
+  servicios: Servicio[];
+  titulo?: string;
+  columnas?: 2 | 3;
+  moneda?: string;
+}
+
+const { servicios, titulo = 'Nuestros Servicios', columnas = 3, moneda = '$' } = Astro.props;
+---
+
+<section class="servicios-grid">
+  <div class="servicios-grid__inner">
+    <h2 class="servicios-grid__heading">{titulo}</h2>
+    <ul
+      class="servicios-grid__items"
+      style={`--cols: ${columnas}`}
+      role="list"
+    >
+      {servicios.map((s) => (
+        <li class="servicios-grid__card">
+          {s.icono && (
+            <span class="servicios-grid__icon" aria-hidden="true">{s.icono}</span>
+          )}
+          <h3 class="servicios-grid__nombre">{s.nombre}</h3>
+          {s.descripcion && (
+            <p class="servicios-grid__desc">{s.descripcion}</p>
+          )}
+          <span class="servicios-grid__precio" aria-label={`Precio: ${moneda}${s.precio}`}>
+            {moneda}{s.precio.toLocaleString('es-MX')}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .servicios-grid {
+    padding: clamp(4rem, 10vw, 7rem) clamp(1.25rem, 5vw, 3rem);
+    background-color: oklch(from var(--color-surface) calc(l - 0.02) c h);
+  }
+
+  .servicios-grid__inner {
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+
+  .servicios-grid__heading {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin: 0 0 3rem;
+    text-align: center;
+  }
+
+  .servicios-grid__items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 3), 1fr);
+    gap: 1.25rem;
+  }
+
+  .servicios-grid__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.75rem;
+    background-color: var(--color-surface);
+    border: 1px solid oklch(from var(--color-text) l c h / 0.08);
+    border-radius: 1rem;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+
+  .servicios-grid__card:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px oklch(from var(--color-primary) l c h / 0.15);
+  }
+
+  .servicios-grid__icon {
+    font-size: 2rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .servicios-grid__nombre {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .servicios-grid__desc {
+    font-size: 0.875rem;
+    color: oklch(from var(--color-text) l c h / 0.65);
+    line-height: 1.6;
+    margin: 0;
+    flex: 1;
+  }
+
+  .servicios-grid__precio {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--color-cta);
+    margin-top: 0.75rem;
+  }
+
+  @media (max-width: 768px) {
+    .servicios-grid__items {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .servicios-grid__items {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

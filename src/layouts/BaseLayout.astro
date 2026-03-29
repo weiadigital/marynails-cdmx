@@ -1,0 +1,274 @@
+---
+/**
+ * BaseLayout.astro — Layout base Weia
+ * Astro 6 · Node 22+ · Tailwind v4 via @tailwindcss/vite
+ *
+ * Incluye:
+ *  - Astro Fonts API (NO Google Fonts CDN)
+ *  - OG / Twitter Card meta tags
+ *  - Schema.org LocalBusiness JSON-LD
+ *  - GA4 con cookie consent (solo activa tras aceptar CookieConsent)
+ *  - CSP nativo (configurado en astro.config.mjs)
+ *  - CookieConsent LFPDPPP 2025
+ *  - CTAWhatsApp flotante
+ */
+import { Font } from 'astro:assets';
+import CookieConsent from '../components/CookieConsent.astro';
+import CTAWhatsApp from '../components/CTAWhatsApp.astro';
+
+interface SchemaLocalBusiness {
+  nombre: string;
+  descripcion: string;
+  telefono: string;
+  direccion: string;
+  ciudad?: string;
+  cp?: string;
+  horario?: string;
+  tipoNegocio?: string; // ej. 'BarberShop', 'BeautySalon', 'Restaurant'
+}
+
+interface Props {
+  // SEO básico
+  titulo: string;
+  descripcion: string;
+  canonicalUrl?: string;
+
+  // OG / Social
+  ogImagen?: string;   // URL absoluta de imagen 1200x630
+  ogTipo?: 'website' | 'article';
+
+  // Schema.org
+  schema: SchemaLocalBusiness;
+
+  // GA4 — undefined = no GA4
+  gaId?: string;
+
+  // WhatsApp flotante
+  telefono: string;
+  mensajeWa?: string;
+
+  // Aviso privacidad
+  avisoUrl?: string;
+
+  // Tokens de color del sector (OKLCH) — se inyectan como CSS vars
+  tokenPrimary?: string;  // ej. 'oklch(45% 0.08 30)'
+  tokenSurface?: string;
+  tokenText?: string;
+  tokenCta?: string;
+
+  // Perfil de movimiento — según Energía calculada del briefing
+  // 'subtle' (E 1-2): transiciones mínimas 150ms / 'fluid' (E 3-4): 250ms / 'expressive' (E 5): 350ms + spring
+  motionProfile?: 'subtle' | 'fluid' | 'expressive';
+
+  // Tipografías (nombre de Google Font o fuente del sistema)
+  fuenteHeading?: string;
+  fuenteBody?: string;
+}
+
+const {
+  titulo,
+  descripcion,
+  canonicalUrl,
+  ogImagen,
+  ogTipo = 'website',
+  schema,
+  gaId,
+  telefono,
+  mensajeWa,
+  avisoUrl = '/aviso-de-privacidad',
+  tokenPrimary = 'oklch(45% 0.08 30)',
+  tokenSurface = 'oklch(99% 0.005 30)',
+  tokenText    = 'oklch(15% 0.02 270)',
+  tokenCta     = 'oklch(55% 0.25 350)',
+  motionProfile = 'fluid',
+  fuenteHeading = 'Barlow',
+  fuenteBody    = 'Inter',
+} = Astro.props;
+
+// Perfiles de movimiento → duración base de transiciones
+const motionDuration = {
+  subtle:     '150ms',
+  fluid:      '250ms',
+  expressive: '350ms',
+}[motionProfile];
+
+const motionEasing = {
+  subtle:     'ease',
+  fluid:      'ease-in-out',
+  expressive: 'cubic-bezier(0.34, 1.56, 0.64, 1)',  // spring suave
+}[motionProfile];
+
+// Schema.org JSON-LD
+const schemaJson = {
+  '@context': 'https://schema.org',
+  '@type': schema.tipoNegocio ?? 'LocalBusiness',
+  name: schema.nombre,
+  description: schema.descripcion,
+  telephone: `+52${schema.telefono.replace(/\D/g, '')}`,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: schema.direccion,
+    addressLocality: schema.ciudad ?? 'Ciudad de México',
+    postalCode: schema.cp,
+    addressCountry: 'MX',
+  },
+  ...(schema.horario && {
+    openingHours: schema.horario,
+  }),
+  ...(ogImagen && { image: ogImagen }),
+};
+
+const titleFull = `${titulo} | ${schema.nombre}`;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content={tokenPrimary} />
+
+    <!-- SEO -->
+    <title>{titleFull}</title>
+    <meta name="description" content={descripcion} />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={ogTipo} />
+    <meta property="og:title" content={titleFull} />
+    <meta property="og:description" content={descripcion} />
+    {ogImagen && <meta property="og:image" content={ogImagen} />}
+    {ogImagen && <meta property="og:image:width" content="1200" />}
+    {ogImagen && <meta property="og:image:height" content="630" />}
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:site_name" content={schema.nombre} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={titleFull} />
+    <meta name="twitter:description" content={descripcion} />
+    {ogImagen && <meta name="twitter:image" content={ogImagen} />}
+
+    <!-- Astro Fonts API — NO CDN externo -->
+    <!-- Las fuentes se configuran en astro.config.mjs (fonts: [...]) -->
+    <!-- Font component inyecta el preload para el cssVariable configurado -->
+    <Font cssVariable="--font-heading" />
+    <Font cssVariable="--font-body" />
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify(schemaJson)} />
+
+    <!-- Tokens de color y movimiento del sector — inyectados dinámicamente -->
+    <style define:vars={{
+      tokenPrimary,
+      tokenSurface,
+      tokenText,
+      tokenCta,
+      motionDuration,
+      motionEasing,
+    }}>
+      :root {
+        --color-primary:   var(--tokenPrimary);
+        --color-surface:   var(--tokenSurface);
+        --color-text:      var(--tokenText);
+        --color-cta:       var(--tokenCta);
+        --color-cta-hover: oklch(from var(--tokenCta) calc(l + 0.08) c h);
+
+        /* Perfil de movimiento — derivado de Energía del briefing */
+        --motion-duration: var(--motionDuration);
+        --motion-easing:   var(--motionEasing);
+        /* Uso: transition: color var(--motion-duration) var(--motion-easing); */
+      }
+    </style>
+
+    <!-- Estilos globales -->
+    <style>
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        text-size-adjust: 100%;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      }
+
+      body {
+        font-family: var(--font-body, system-ui, sans-serif);
+        background-color: var(--color-surface);
+        color: var(--color-text);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-heading, system-ui, sans-serif);
+        line-height: 1.1;
+      }
+
+      img, video {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      /* Skip link — accesibilidad */
+      .skip-link {
+        position: absolute;
+        top: -100%;
+        left: 1rem;
+        padding: 0.5rem 1rem;
+        background: var(--color-cta);
+        color: oklch(99% 0.005 230);
+        font-weight: 700;
+        border-radius: 0 0 0.5rem 0.5rem;
+        text-decoration: none;
+        z-index: 10000;
+        transition: top 0.1s;
+      }
+
+      .skip-link:focus {
+        top: 0;
+      }
+    </style>
+
+    <slot name="head" />
+  </head>
+
+  <body>
+    <!-- Skip navigation — WCAG 2.2 AA -->
+    <a href="#main-content" class="skip-link">Ir al contenido principal</a>
+
+    <main id="main-content" tabindex="-1">
+      <slot />
+    </main>
+
+    <!-- Botón WhatsApp flotante -->
+    <CTAWhatsApp
+      telefono={telefono}
+      mensaje={mensajeWa}
+    />
+
+    <!-- Cookie Consent LFPDPPP 2025 -->
+    <CookieConsent
+      negocio={schema.nombre}
+      avisoUrl={avisoUrl}
+      gaId={gaId}
+    />
+
+    <slot name="after-body" />
+  </body>
+</html>

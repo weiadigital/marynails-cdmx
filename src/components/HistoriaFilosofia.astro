@@ -1,0 +1,132 @@
+---
+/**
+ * HistoriaFilosofia.astro — Historia o filosofía del negocio
+ * Asimetría 60/40: cita/texto izquierda + imagen derecha.
+ * Zero JS. WCAG 2.2 AA. Lazy loading en imagen.
+ * Uso: T4-Narrativo. Belleza/spa, nail premium, restaurante artesanal.
+ *
+ * INSTRUCCIÓN PARA MIXTLI:
+ * La cita debe ser extraída del campo "especial" o descripción del briefing.
+ * Si no hay nada personal del dueño → no usar este componente.
+ * El autor debe ser el nombre del dueño o del negocio, no inventado.
+ */
+
+interface Props {
+  cita: string;           // frase o filosofía del negocio/dueño
+  autor: string;          // nombre del dueño o del negocio
+  textoApoyo?: string;    // párrafo breve de contexto (opcional)
+  imagenSrc: string;      // /images/historia.webp
+  imagenAlt: string;      // descripción real de la imagen
+}
+
+const {
+  cita,
+  autor,
+  textoApoyo,
+  imagenSrc,
+  imagenAlt,
+} = Astro.props;
+---
+
+<section class="historia" aria-label="Nuestra historia">
+  <div class="historia__inner">
+    <div class="historia__texto">
+      <blockquote class="historia__cita">
+        <p>"{cita}"</p>
+        <footer>
+          <cite class="historia__autor">— {autor}</cite>
+        </footer>
+      </blockquote>
+      {textoApoyo && (
+        <p class="historia__apoyo">{textoApoyo}</p>
+      )}
+    </div>
+
+    <div class="historia__imagen-wrap">
+      <img
+        src={imagenSrc}
+        alt={imagenAlt}
+        width="600"
+        height="700"
+        loading="lazy"
+        decoding="async"
+        class="historia__img"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .historia {
+    padding: clamp(4rem, 10vw, 7rem) clamp(1.25rem, 5vw, 3rem);
+    background-color: oklch(from var(--color-surface) calc(l - 0.015) c h);
+    overflow: hidden;
+  }
+
+  .historia__inner {
+    max-width: 72rem;
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr; /* 60/40 — asimetría controlada */
+    gap: 5rem;
+    align-items: center;
+  }
+
+  .historia__cita {
+    margin: 0 0 2rem;
+    padding: 0;
+    border: none;
+  }
+
+  .historia__cita p {
+    font-size: clamp(1.375rem, 3.5vw, 2rem);
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--color-text);
+    font-style: italic;
+    margin: 0 0 1rem;
+    font-family: var(--font-heading, inherit);
+  }
+
+  .historia__autor {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    font-style: normal;
+    color: var(--color-cta);
+  }
+
+  .historia__apoyo {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: oklch(from var(--color-text) l c h / 0.7);
+    margin: 0;
+    max-width: 52ch;
+  }
+
+  .historia__imagen-wrap {
+    border-radius: 1.5rem;
+    overflow: hidden;
+    aspect-ratio: 4/5;
+    box-shadow: 0 24px 64px oklch(0% 0 0 / 0.15);
+  }
+
+  .historia__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .historia__inner {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+
+    .historia__imagen-wrap {
+      aspect-ratio: 16/9;
+      order: -1;
+    }
+  }
+</style>

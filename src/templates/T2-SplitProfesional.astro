@@ -1,0 +1,205 @@
+---
+/**
+ * T2 — Split Profesional
+ * Intención: "Necesito credibilidad antes de vender"
+ * Sectores default: salud, servicios profesionales
+ * Estructura: Hero split → Stats credenciales → Servicios lista
+ *             → Proceso 3 pasos → FAQ → Formulario contacto → Footer
+ *
+ * INSTRUCCIONES PARA SOF.IA:
+ * 1. Stats deben ser REALES: años de experiencia, pacientes atendidos,
+ *    certificaciones, casos resueltos. NUNCA inventar.
+ * 2. ProcesoPasos: adaptar los 3 pasos al sector específico.
+ *    Salud: "Agenda → Consulta → Tratamiento"
+ *    Legal: "Consulta → Análisis → Resolución"
+ * 3. FAQ: 4-5 preguntas del sector. Ver design-system.md para defaults.
+ * 4. ContactoFormulario: campos recomendados según sector.
+ *    Salud: nombre, telefono, servicio, mensaje
+ *    Servicios prof.: nombre, email, telefono, mensaje
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroSplit from '../components/HeroSplit.astro';
+import StatsCredenciales from '../components/StatsCredenciales.astro';
+import ServiciosList from '../components/ServiciosList.astro';
+import ProcesoPasos from '../components/ProcesoPasos.astro';
+import FAQAccordion from '../components/FAQAccordion.astro';
+import ContactoFormulario from '../components/ContactoFormulario.astro';
+import Footer from '../components/Footer.astro';
+import GoogleTagManager from '../components/GoogleTagManager.astro';
+
+// ─── DATOS DEL CLIENTE ────────────────────────────────────────────────────────
+
+const negocio = {
+  nombre:      '[NOMBRE_NEGOCIO]',
+  descripcion: '[DESCRIPCION_1_ORACION]',
+  telefono:    '[10_DIGITOS_SIN_PREFIJO]',
+  whatsapp:    '[10_DIGITOS_SIN_PREFIJO]',
+  direccion:   '[DIRECCION_COMPLETA]',
+  ciudad:      '[CIUDAD_ALCALDIA]',
+  cp:          '[CODIGO_POSTAL]',
+  horario:     '[HORARIO_TEXTO]',
+  tipoSchema:  '[TIPO_SCHEMA]',      // ej. 'MedicalBusiness', 'LegalService'
+  email:       '[EMAIL_OBLIGATORIO]', // en T2 el email es más importante
+  redes: [],
+};
+
+const seo = {
+  titulo:      '[TITULO_SEO_50_CHARS]',
+  descripcion: '[META_DESC_155_CHARS]',
+  canonicalUrl: 'https://[DOMINIO].vercel.app',
+  ogImagen:    'https://[DOMINIO].vercel.app/og-default.jpg',
+};
+
+const tokens = {
+  tokenPrimary:  '[TOKEN_PRIMARY_OKLCH]',
+  tokenSurface:  '[TOKEN_SURFACE_OKLCH]',
+  tokenText:     '[TOKEN_TEXT_OKLCH]',
+  tokenCta:      '[TOKEN_CTA_OKLCH]',
+};
+
+// Perfil de movimiento — derivado de Energía calculada del briefing
+// E 1-2 → 'subtle' | E 3-4 → 'fluid' | E 5 → 'expressive'
+const motionProfile = '[MOTION_PROFILE]' as 'subtle' | 'fluid' | 'expressive';
+
+const fuentes = {
+  heading: '[FUENTE_HEADING]',
+  body:    'Inter',
+};
+
+// ─── CONTENIDO ────────────────────────────────────────────────────────────────
+
+const hero = {
+  titulo:      '[HEADLINE_CREDIBILIDAD]',  // ej. "Tu salud en manos expertas"
+  subtitulo:   '[SUBTITULO_ESPECIALIDAD]', // ej. "Odontología general y estética"
+  badge:       '[CREDENCIAL_CORTA]',       // ej. "Cédula 12345678" o "15 años"
+  ctaTexto:    '[TEXTO_CTA]',              // ej. "Agenda tu consulta"
+  ctaUrl:      `https://api.whatsapp.com/send?phone=521${negocio.whatsapp}&text=${encodeURIComponent('Hola, quiero agendar una consulta')}`,
+  imagenSrc:   '/images/hero.webp',
+  imagenAlt:   '[DESC_ALT_REAL]',
+  imagenLado:  'derecha' as const,
+};
+
+// Stats de credibilidad — SOLO datos reales y verificables
+const stats = [
+  { numero: '[NUM_1]', label: '[LABEL_1]' },  // ej. { numero: '15', label: 'años de experiencia' }
+  { numero: '[NUM_2]', label: '[LABEL_2]' },  // ej. { numero: '3,200', label: 'pacientes atendidos' }
+  { numero: '[NUM_3]', label: '[LABEL_3]' },  // ej. { numero: '4', label: 'especialidades' }
+];
+
+const servicios = [
+  { nombre: '[SERVICIO_1]', precio: 0, descripcion: '[DESC_BREVE]' },
+  { nombre: '[SERVICIO_2]', precio: 0, descripcion: '[DESC_BREVE]' },
+  { nombre: '[SERVICIO_3]', precio: 0, descripcion: '[DESC_BREVE]' },
+];
+
+const proceso = [
+  {
+    numero: 1,
+    titulo: '[PASO_1_TITULO]',       // ej. "Agenda tu cita"
+    descripcion: '[PASO_1_DESC]',    // ej. "Por WhatsApp o teléfono en menos de 2 min"
+    icono: '[EMOJI_OPCIONAL]',
+  },
+  {
+    numero: 2,
+    titulo: '[PASO_2_TITULO]',
+    descripcion: '[PASO_2_DESC]',
+    icono: '[EMOJI_OPCIONAL]',
+  },
+  {
+    numero: 3,
+    titulo: '[PASO_3_TITULO]',
+    descripcion: '[PASO_3_DESC]',
+    icono: '[EMOJI_OPCIONAL]',
+  },
+];
+
+const faq = [
+  { pregunta: '[PREGUNTA_1]', respuesta: '[RESPUESTA_1]' },
+  { pregunta: '[PREGUNTA_2]', respuesta: '[RESPUESTA_2]' },
+  { pregunta: '[PREGUNTA_3]', respuesta: '[RESPUESTA_3]' },
+  { pregunta: '[PREGUNTA_4]', respuesta: '[RESPUESTA_4]' },
+];
+
+const gtmId = '[GTM-XXXXXXX]';
+---
+
+{gtmId && <GoogleTagManager gtmId={gtmId} />}
+
+<BaseLayout
+  titulo={seo.titulo}
+  descripcion={seo.descripcion}
+  canonicalUrl={seo.canonicalUrl}
+  ogImagen={seo.ogImagen}
+  schema={{
+    nombre:      negocio.nombre,
+    descripcion: negocio.descripcion,
+    telefono:    negocio.telefono,
+    direccion:   negocio.direccion,
+    ciudad:      negocio.ciudad,
+    cp:          negocio.cp,
+    horario:     negocio.horario,
+    tipoNegocio: negocio.tipoSchema,
+  }}
+  telefono={negocio.whatsapp}
+  mensajeWa={`Hola, quiero información sobre los servicios de ${negocio.nombre}`}
+  {...tokens}
+  motionProfile={motionProfile}
+  fuenteHeading={fuentes.heading}
+  fuenteBody={fuentes.body}
+>
+  {/* ── SECCIÓN 1: Hero split — credibilidad visual ── */}
+  <HeroSplit
+    titulo={hero.titulo}
+    subtitulo={hero.subtitulo}
+    badge={hero.badge}
+    ctaTexto={hero.ctaTexto}
+    ctaUrl={hero.ctaUrl}
+    imagenSrc={hero.imagenSrc}
+    imagenAlt={hero.imagenAlt}
+    imagenLado={hero.imagenLado}
+  />
+
+  {/* ── SECCIÓN 2: Stats de credibilidad ── */}
+  <StatsCredenciales stats={stats} />
+
+  {/* ── SECCIÓN 3: Lista de servicios ── */}
+  <ServiciosList
+    servicios={servicios}
+    titulo="Servicios"
+  />
+
+  {/* ── SECCIÓN 4: Proceso en 3 pasos ── */}
+  <ProcesoPasos
+    pasos={proceso}
+    titulo="¿Cómo funciona?"
+    subtitulo="Así de fácil es empezar"
+  />
+
+  {/* ── SECCIÓN 5: FAQ ── */}
+  <FAQAccordion
+    preguntas={faq}
+    titulo="Preguntas frecuentes"
+  />
+
+  {/* ── SECCIÓN 6: Formulario de contacto ── */}
+  <ContactoFormulario
+    titulo="¿Listo para empezar?"
+    subtitulo={`Escríbenos y te respondemos el mismo día.`}
+    endpoint="[URL_FORMSPREE_O_ENDPOINT]"
+    campos={['nombre', 'telefono', 'servicio', 'mensaje']}
+    servicios={servicios.map(s => s.nombre)}
+    ctaTexto="Enviar mensaje"
+    whatsappFallback={negocio.whatsapp}
+  />
+
+  {/* ── SECCIÓN 7: Footer ── */}
+  <Footer
+    negocio={negocio.nombre}
+    direccion={negocio.direccion}
+    telefono={negocio.telefono}
+    email={negocio.email}
+    redes={negocio.redes}
+  />
+</BaseLayout>
+

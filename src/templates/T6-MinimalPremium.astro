@@ -1,0 +1,216 @@
+---
+/**
+ * T6 — Minimal Premium
+ * Intención: "Menos palabras, más peso. La exclusividad se siente."
+ * Sectores default: inmobiliaria, servicios corporativos, consultoría
+ * Estructura: Hero minimal con mucho aire → Servicios grid → Logos clientes
+ *             → Timeline proceso → FAQ → Formulario → Footer
+ *
+ * INSTRUCCIONES PARA SOF.IA:
+ * 1. El HeroMinimal en T6 NO tiene badge — sería contrario al tono premium.
+ *    El headline debe ser corto: máximo 6-8 palabras.
+ *    ej. "Resultados. No promesas." o "Tu patrimonio en buenas manos."
+ * 2. SocialProofLogos: si el cliente no tiene logos de clientes,
+ *    se puede usar logos de certificaciones, colegios profesionales,
+ *    o asociaciones a las que pertenece.
+ *    Si no tiene NADA → omitir esta sección.
+ * 3. ProcesoTimeline es clave en T6 — el cliente de servicios premium
+ *    necesita saber exactamente qué va a pasar y en qué tiempo.
+ *    Incluir etiquetas temporales si es posible: "Día 1", "Semana 1-2", etc.
+ * 4. Tono del copy: Formalidad ≥ 4 → "usted". Sin emojis. Sin exclamaciones.
+ * 5. ContactoFormulario: incluir campo email — en este segmento es esperado.
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroMinimal from '../components/HeroMinimal.astro';
+import ServiciosGrid from '../components/ServiciosGrid.astro';
+import SocialProofLogos from '../components/SocialProofLogos.astro';
+import ProcesoTimeline from '../components/ProcesoTimeline.astro';
+import FAQAccordion from '../components/FAQAccordion.astro';
+import ContactoFormulario from '../components/ContactoFormulario.astro';
+import Footer from '../components/Footer.astro';
+import GoogleTagManager from '../components/GoogleTagManager.astro';
+
+// ─── DATOS DEL CLIENTE ────────────────────────────────────────────────────────
+
+const negocio = {
+  nombre:      '[NOMBRE_NEGOCIO]',
+  descripcion: '[DESCRIPCION_1_ORACION]',
+  telefono:    '[10_DIGITOS_SIN_PREFIJO]',
+  whatsapp:    '[10_DIGITOS_SIN_PREFIJO]',
+  direccion:   '[DIRECCION_COMPLETA]',
+  ciudad:      '[CIUDAD_ALCALDIA]',
+  cp:          '[CODIGO_POSTAL]',
+  horario:     '[HORARIO_TEXTO]',
+  tipoSchema:  '[TIPO_SCHEMA]',   // ej. 'RealEstateAgent', 'LegalService', 'AccountingService'
+  email:       '[EMAIL_OBLIGATORIO]',
+  redes: [],
+};
+
+const seo = {
+  titulo:      '[TITULO_SEO_50_CHARS]',
+  descripcion: '[META_DESC_155_CHARS]',
+  canonicalUrl: 'https://[DOMINIO].vercel.app',
+  ogImagen:    'https://[DOMINIO].vercel.app/og-default.jpg',
+};
+
+const tokens = {
+  tokenPrimary:  '[TOKEN_PRIMARY_OKLCH]',
+  tokenSurface:  '[TOKEN_SURFACE_OKLCH]',
+  tokenText:     '[TOKEN_TEXT_OKLCH]',
+  tokenCta:      '[TOKEN_CTA_OKLCH]',
+};
+
+// Perfil de movimiento — derivado de Energía calculada del briefing
+// E 1-2 → 'subtle' | E 3-4 → 'fluid' | E 5 → 'expressive'
+const motionProfile = '[MOTION_PROFILE]' as 'subtle' | 'fluid' | 'expressive';
+
+const fuentes = {
+  heading: '[FUENTE_HEADING]',  // DM Serif Display o Space Grotesk según sector
+  body:    'Inter',
+};
+
+// ─── CONTENIDO ────────────────────────────────────────────────────────────────
+
+const hero = {
+  titulo:    '[HEADLINE_CORTO_PREMIUM]',   // máx 8 palabras, sin badge
+  subtitulo: '[SUBTITULO_PROPUESTA_VALOR]',
+  ctaTexto:  '[TEXTO_CTA_FORMAL]',         // ej. "Solicitar consulta", "Agendar reunión"
+  ctaUrl:    `https://api.whatsapp.com/send?phone=521${negocio.whatsapp}&text=${encodeURIComponent('Buenos días, me gustaría solicitar información')}`,
+  // Sin badge, sin imagen de fondo — el peso está en la tipografía y el espacio
+};
+
+// Servicios en grid — máx 6, bien descritos
+const servicios = [
+  { nombre: '[SERVICIO_1]', precio: 0, descripcion: '[DESC_2_LINEAS]', icono: '[EMOJI_SUTIL]' },
+  { nombre: '[SERVICIO_2]', precio: 0, descripcion: '[DESC_2_LINEAS]', icono: '[EMOJI_SUTIL]' },
+  { nombre: '[SERVICIO_3]', precio: 0, descripcion: '[DESC_2_LINEAS]', icono: '[EMOJI_SUTIL]' },
+  { nombre: '[SERVICIO_4]', precio: 0, descripcion: '[DESC_2_LINEAS]', icono: '[EMOJI_SUTIL]' },
+];
+
+// Logos de clientes o certificaciones
+// Si no hay ninguno, poner tieneLogos: false
+const logos = {
+  tieneLogos: false,
+  etiqueta: '[ETIQUETA_LOGOS]',  // ej. "Certificaciones" o "Han confiado en nosotros"
+  items: [
+    // { src: '/images/logo-1.webp', alt: '[ALT]', url: '[URL_OPCIONAL]' },
+  ],
+};
+
+// Timeline del proceso — incluir tiempos reales si los hay
+const proceso = [
+  {
+    titulo:      '[ETAPA_1]',
+    descripcion: '[DESC_ETAPA_1]',
+    etiqueta:    '[TIEMPO_ETAPA_1]',  // ej. "Día 1", "Semana 1"
+  },
+  {
+    titulo:      '[ETAPA_2]',
+    descripcion: '[DESC_ETAPA_2]',
+    etiqueta:    '[TIEMPO_ETAPA_2]',
+  },
+  {
+    titulo:      '[ETAPA_3]',
+    descripcion: '[DESC_ETAPA_3]',
+    etiqueta:    '[TIEMPO_ETAPA_3]',
+  },
+  {
+    titulo:      '[ETAPA_4]',
+    descripcion: '[DESC_ETAPA_4]',
+    etiqueta:    '[TIEMPO_ETAPA_4]',
+  },
+];
+
+const faq = [
+  { pregunta: '[PREGUNTA_1]', respuesta: '[RESPUESTA_1]' },
+  { pregunta: '[PREGUNTA_2]', respuesta: '[RESPUESTA_2]' },
+  { pregunta: '[PREGUNTA_3]', respuesta: '[RESPUESTA_3]' },
+  { pregunta: '[PREGUNTA_4]', respuesta: '[RESPUESTA_4]' },
+  { pregunta: '[PREGUNTA_5]', respuesta: '[RESPUESTA_5]' },
+];
+
+const gtmId = '[GTM-XXXXXXX]';
+---
+
+{gtmId && <GoogleTagManager gtmId={gtmId} />}
+
+<BaseLayout
+  titulo={seo.titulo}
+  descripcion={seo.descripcion}
+  canonicalUrl={seo.canonicalUrl}
+  ogImagen={seo.ogImagen}
+  schema={{
+    nombre:      negocio.nombre,
+    descripcion: negocio.descripcion,
+    telefono:    negocio.telefono,
+    direccion:   negocio.direccion,
+    ciudad:      negocio.ciudad,
+    cp:          negocio.cp,
+    horario:     negocio.horario,
+    tipoNegocio: negocio.tipoSchema,
+  }}
+  telefono={negocio.whatsapp}
+  mensajeWa="Buenos días, me gustaría solicitar información"
+  {...tokens}
+  motionProfile={motionProfile}
+  fuenteHeading={fuentes.heading}
+  fuenteBody={fuentes.body}
+>
+  {/* ── SECCIÓN 1: Hero minimal — tipografía y espacio ── */}
+  <HeroMinimal
+    titulo={hero.titulo}
+    subtitulo={hero.subtitulo}
+    ctaTexto={hero.ctaTexto}
+    ctaUrl={hero.ctaUrl}
+  />
+
+  {/* ── SECCIÓN 2: Servicios en grid ── */}
+  <ServiciosGrid
+    servicios={servicios}
+    titulo="Nuestros servicios"
+    columnas={2}
+  />
+
+  {/* ── SECCIÓN 3: Logos (solo si hay) ── */}
+  {logos.tieneLogos && logos.items.length > 0 && (
+    <SocialProofLogos
+      logos={logos.items}
+      etiqueta={logos.etiqueta}
+      variante="gris"
+    />
+  )}
+
+  {/* ── SECCIÓN 4: Timeline del proceso ── */}
+  <ProcesoTimeline
+    pasos={proceso}
+    titulo="Nuestro proceso"
+    subtitulo="Claridad y transparencia en cada etapa"
+  />
+
+  {/* ── SECCIÓN 5: FAQ ── */}
+  <FAQAccordion
+    preguntas={faq}
+    titulo="Preguntas frecuentes"
+  />
+
+  {/* ── SECCIÓN 6: Formulario de contacto formal ── */}
+  <ContactoFormulario
+    titulo="¿Hablamos?"
+    subtitulo="Déjenos sus datos y nos ponemos en contacto en menos de 24 horas."
+    endpoint="[URL_FORMSPREE_O_ENDPOINT]"
+    campos={['nombre', 'email', 'telefono', 'servicio', 'mensaje']}
+    servicios={servicios.map(s => s.nombre)}
+    ctaTexto="Enviar mensaje"
+    whatsappFallback={negocio.whatsapp}
+  />
+
+  {/* ── SECCIÓN 7: Footer ── */}
+  <Footer
+    negocio={negocio.nombre}
+    direccion={negocio.direccion}
+    telefono={negocio.telefono}
+    email={negocio.email}
+    redes={negocio.redes}
+  />
+</BaseLayout>

@@ -1,0 +1,47 @@
+---
+interface Props {
+  embedUrl: string;
+  altura?: string;
+  titulo?: string;
+  borderRadius?: string;
+}
+
+const {
+  embedUrl,
+  altura = '420px',
+  titulo = 'Mapa de ubicación',
+  borderRadius = '1rem',
+} = Astro.props;
+---
+
+<div
+  class="map-interactive"
+  style={`--map-height: ${altura}; --map-radius: ${borderRadius}`}
+>
+  <iframe
+    src={embedUrl}
+    width="100%"
+    height="100%"
+    style="border:0;"
+    allowfullscreen=""
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade"
+    title={titulo}
+  ></iframe>
+</div>
+
+<style>
+  .map-interactive {
+    width: 100%;
+    height: var(--map-height, 420px);
+    border-radius: var(--map-radius, 1rem);
+    overflow: hidden;
+    box-shadow: 0 4px 24px oklch(0% 0 0 / 0.1);
+  }
+
+  .map-interactive iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>

@@ -1,0 +1,58 @@
+/**
+ * tokens.css — Template base de tokens OKLCH
+ * Weia Studio · Mixtli Landing
+ *
+ * INSTRUCCIONES:
+ * 1. Reemplazar el bloque :root con el sector del cliente
+ *    (ver MIXTLI_Engine_v1.md §5 o design-system.md §3)
+ * 2. El @theme inline conecta los tokens con Tailwind v4
+ * 3. NUNCA usar colores hardcodeados — siempre var(--color-*)
+ *
+ * Sectores disponibles:
+ *   barberia_tradicional | barberia_moderna | belleza_spa | nail_salon
+ *   salud | comida | servicios_profesionales | inmobiliaria
+ */
+
+@import "tailwindcss";
+
+/* ─── TOKENS DEL SECTOR (reemplazar según cliente) ──────────────────────── */
+/* Ejemplo: nail_salon */
+:root {
+  --color-primary:     oklch(65% 0.18 350);
+  --color-accent:      oklch(75% 0.10 80);
+  --color-surface:     oklch(98% 0.005 350);
+  --color-surface-alt: oklch(95% 0.01 350);
+  --color-text:        oklch(20% 0.02 350);
+  --color-cta:         oklch(65% 0.18 350);
+  --color-cta-hover:   oklch(55% 0.18 350);
+  --color-muted:       oklch(55% 0.02 350);
+  --color-border:      oklch(85% 0.02 350);
+}
+
+/* ─── PERSONALIDAD VISUAL (calcular desde adjetivos del cliente) ─────────── */
+/* Energía controla: --heading-weight, --hero-size, --shadow */
+/* Formalidad controla: --radius, --section-gap-mobile, --section-gap-desktop */
+:root {
+  /* Energía 3 — Equilibrada (heading 600, sombra media) */
+  --heading-weight:     600;
+  --hero-size:          clamp(2rem, 7vw, 4rem);
+  --shadow-card:        0 2px 8px oklch(0% 0 0 / 0.08);
+
+  /* Formalidad 3 — Profesional (radius 6px, gaps medios) */
+  --radius:             6px;
+  --section-gap-mobile: 48px;
+  --section-gap-desktop: 72px;
+}
+
+/* ─── INTEGRACIÓN TAILWIND v4 ────────────────────────────────────────────── */
+@theme inline {
+  --color-primary:     var(--color-primary);
+  --color-accent:      var(--color-accent);
+  --color-surface:     var(--color-surface);
+  --color-surface-alt: var(--color-surface-alt);
+  --color-text:        var(--color-text);
+  --color-cta:         var(--color-cta);
+  --color-cta-hover:   var(--color-cta-hover);
+  --color-muted:       var(--color-muted);
+  --color-border:      var(--color-border);
+}

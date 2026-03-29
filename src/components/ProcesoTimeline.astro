@@ -1,0 +1,187 @@
+---
+/**
+ * ProcesoTimeline.astro — Proceso en timeline vertical
+ * Zero JS. WCAG 2.2 AA.
+ * Uso: servicios profesionales, inmobiliaria, procesos complejos
+ */
+
+interface Paso {
+  titulo: string;
+  descripcion: string;
+  etiqueta?: string; // "Día 1", "Semana 2", "Fase 1"
+  icono?: string;
+}
+
+interface Props {
+  pasos: Paso[];
+  titulo?: string;
+  subtitulo?: string;
+}
+
+const {
+  pasos,
+  titulo = 'Nuestro proceso',
+  subtitulo,
+} = Astro.props;
+---
+
+<section class="timeline" aria-labelledby="timeline-heading">
+  <div class="timeline__inner">
+    <header class="timeline__header">
+      <h2 class="timeline__titulo" id="timeline-heading">{titulo}</h2>
+      {subtitulo && <p class="timeline__sub">{subtitulo}</p>}
+    </header>
+
+    <ol class="timeline__lista" role="list">
+      {pasos.map((paso, i) => (
+        <li class="timeline__item">
+          <div class="timeline__indicador" aria-hidden="true">
+            <div class="timeline__punto">
+              {paso.icono
+                ? <span class="timeline__icono">{paso.icono}</span>
+                : <span class="timeline__num">{i + 1}</span>
+              }
+            </div>
+            {i < pasos.length - 1 && (
+              <div class="timeline__linea"></div>
+            )}
+          </div>
+
+          <div class="timeline__contenido">
+            {paso.etiqueta && (
+              <span class="timeline__etiqueta">{paso.etiqueta}</span>
+            )}
+            <h3 class="timeline__paso-titulo">{paso.titulo}</h3>
+            <p class="timeline__paso-desc">{paso.descripcion}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .timeline {
+    padding: clamp(4rem, 10vw, 7rem) clamp(1.25rem, 5vw, 3rem);
+    background-color: oklch(from var(--color-surface) calc(l - 0.015) c h);
+  }
+
+  .timeline__inner {
+    max-width: 56rem;
+    margin-inline: auto;
+  }
+
+  .timeline__header {
+    margin-bottom: 3.5rem;
+  }
+
+  .timeline__titulo {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin: 0 0 0.75rem;
+  }
+
+  .timeline__sub {
+    font-size: 1.0625rem;
+    color: oklch(from var(--color-text) l c h / 0.65);
+    line-height: 1.6;
+    max-width: 52ch;
+    margin: 0;
+  }
+
+  .timeline__lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .timeline__item {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 0 1.75rem;
+  }
+
+  .timeline__indicador {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .timeline__punto {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  .timeline__num {
+    font-size: 1.0625rem;
+    font-weight: 800;
+    color: oklch(15% 0.02 270);
+    line-height: 1;
+  }
+
+  .timeline__icono {
+    font-size: 1.375rem;
+    line-height: 1;
+  }
+
+  .timeline__linea {
+    width: 2px;
+    flex: 1;
+    min-height: 2rem;
+    background: linear-gradient(
+      to bottom,
+      var(--color-primary),
+      oklch(from var(--color-primary) l c h / 0.2)
+    );
+    margin: 0.25rem 0;
+  }
+
+  .timeline__contenido {
+    padding-bottom: 3rem;
+  }
+
+  .timeline__item:last-child .timeline__contenido {
+    padding-bottom: 0;
+  }
+
+  .timeline__etiqueta {
+    display: inline-block;
+    padding: 0.2rem 0.75rem;
+    background-color: oklch(from var(--color-primary) l c h / 0.12);
+    color: var(--color-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .timeline__paso-titulo {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 0.5rem;
+    line-height: 1.3;
+  }
+
+  .timeline__paso-desc {
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    color: oklch(from var(--color-text) l c h / 0.72);
+    margin: 0;
+    max-width: 58ch;
+  }
+</style>
